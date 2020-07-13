@@ -1,8 +1,29 @@
+;Se renombran los registros que se  van a utilizar para los inputs
+;Notaciónes: C = Cámara, T = Térmica, D = Distancia
+
+CT			RN			R0
+CD			RN			R1
+
+;Se renombran los registros que se van a utilizar como variables
+
+BOCINA				RN		R5
+LED					RN		R6
+
+
+;Se asignan etiquetas para los espacios de memoria RAM donde se almacenaran los ouputs
+;La memoria RAM comienza en la dirección 0x20000000
+;Notaciones: S = Salida, SE = Server, LCD = LCD
+;Cada dirección de memoria apunta a un bloque de 4 bytes de tamaño
+
+SA			EQU		0x20000000	;se asigna la etiqueta salida de alarmas al espacio de memoria
+SSE			EQU		0x20000004	;se asigna la etiqueta salida hacia el servidor al espacio de memoria
+SLCD		EQU		0x20000008	;se asigna la etiqueta salida del LCD al espacio de memoria
+	
+
 ;Se asignan etiquetas para las constantes de 0 y 1 que se usaran para mostrar el valor de los outputs que irán a las alarmas
 
 TRUE		EQU		1
 FALSE		EQU		0
-
 
 
 ;Código del programa principal
@@ -40,7 +61,18 @@ GMA		MOV R7,1
 ; Paso #4
 ; Subrutina que se encarga de mandar al LCD el mensaje obtenido através del servidor y de activar o no las alarmas dependiendo de lo obtenido por el Server
 
-EMA 	MOV R8,0
+EMA 	CMP R2,TRUE	;if alarma == 1
+		BNE L1
+		MOV R5,TRUE	;bocina a 1
+		MOV R6,TRUE	;bocina a 1
+		B L2
+	L1
+		MOV R5,FALSE	;bocina a 0
+		MOV R6,FALSE	;LED a 0
+	L2
+		
+		
+		
 		BL  INF ; Se regresa al Branch INF para generar un loop infinito
 		
 		END
