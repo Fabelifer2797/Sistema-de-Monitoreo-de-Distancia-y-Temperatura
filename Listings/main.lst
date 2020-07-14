@@ -13,152 +13,862 @@ ARM Macro Assembler    Page 1
     4 00000000 00000000 
                        FALSE   EQU              0
     5 00000000         
-    6 00000000         ; Se asignan etiquetas para los espacios de memoria RAM 
-                       donde se almacenaran los ouputs del sistema
-    7 00000000         ; La memoria RAM comienza en la dirección 0x20000000
-    8 00000000         ;Cada dirección de memoria apunta a un bloque de 4 bytes
-                        de tamaño
+    6 00000000         ; Se renombran los registros que se van a utilizar como 
+                       variables
+    7 00000000        0 
+                       CT      RN               R0
+    8 00000000        1 
+                       CD      RN               R1
     9 00000000         
-   10 00000000 20000000 
+   10 00000000         
+   11 00000000         ; Se asignan etiquetas para los espacios de memoria RAM 
+                       donde se almacenaran los ouputs del sistema
+   12 00000000         ; La memoria RAM comienza en la dirección 0x20000000
+   13 00000000         ;Cada dirección de memoria apunta a un bloque de 4 bytes
+                        de tamaño
+   14 00000000         
+   15 00000000 20000000 
                        RXPIN   EQU              0x20000000  ; Etiqueta del espa
                                                             cio de memoria dond
                                                             e se asigna el pin 
                                                             RX del ESP8266
-   11 00000000 20000004 
+   16 00000000 20000004 
                        TXPIN   EQU              0x20000004  ; Etiqueta del espa
                                                             cio de memoria dond
                                                             e se asigna el pin 
                                                             TX del ESP8266
-   12 00000000 20000008 
+   17 00000000 20000008 
                        BRS     EQU              0X20000008  ; Etiqueta del espa
                                                             cio de memoria dond
                                                             e se asigna el Baud
                                                              Rate Serial
-   13 00000000         
-   14 00000000         
-   15 00000000         
-   16 00000000         
-   17 00000000         ;Código del programa principal
-   18 00000000         
-   19 00000000                 AREA             Main, CODE, READONLY
-   20 00000000                 ENTRY
-   21 00000000                 EXPORT           __main
-   22 00000000         
-   23 00000000         __main
-   24 00000000         
-   25 00000000         ; Conjunto de Branches que representan el esqueleto del 
-                       código
-   26 00000000         
-   27 00000000 F000 F808       BL               SMW         ; Branch de la subr
-                                                            utina SMW = Setup d
-                                                            el Módulo de Wifi
-   28 00000004 F000 F81C 
-                       INF     BL               GDC         ; Branch de la subr
-                                                            utina GDC = Get de 
-                                                            los Datos de las Cá
-                                                            maras
-   29 00000008 F000 F81C       BL               PDS         ; Branch de la subr
-                                                            utina PDS = Post de
-                                                             los Datos al Serve
-                                                            r
-   30 0000000C F000 F81C       BL               GMA         ; Branch de la subr
-                                                            utina GMA = Get del
+   18 00000000 2000000C 
+                       EMC1    EQU              0x2000000C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el Enable Multiple
+                                                             Connections TCP de
+                                                            l Módulo Wifi Parte
+                                                             1
+   19 00000000 20000010 
+                       EMC2    EQU              0x20000010  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el Enable Multiple
+                                                             Connections TCP de
+                                                            l Módulo Wifi Parte
+                                                             2
+   20 00000000 20000014 
+                       EMC3    EQU              0x20000014  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el Enable Multiple
+                                                             Connections TCP de
+                                                            l Módulo Wifi Parte
+                                                             3
 
 
 
 ARM Macro Assembler    Page 2 
 
 
-                                                             Mensaje y de la Al
-                                                            arma
-   31 00000010 F000 F81C       BL               EMA         ; Branch de la subr
-                                                            utina EMA = Escritu
-                                                            ra del Mensaje en e
-                                                            l LCD y activar las
-                                                             Alarmas
-   32 00000014         
-   33 00000014         
-   34 00000014         ; Paso #0
-   35 00000014         ; Subrutina que se encarga de hacer el setup de los pine
-                       s y las condiciones requeridas por el módulo de Wifi ESP
-                       8266
-   36 00000014         
-   37 00000014         ;Se establecen los pines en que va a funcionar el módulo
-                       
-   38 00000014 F04F 0602 
-                       SMW     MOV              R6,#2
-   39 00000018 F04F 0703       MOV              R7,#3
-   40 0000001C F04F 5800       LDR              R8,=RXPIN   ; RX se establce en
-                                                             el pin 2
-   41 00000020 F8C8 6000       STR              R6,[R8]
-   42 00000024 F8DF 802C       LDR              R8,=TXPIN   ; TX se establece e
-                                                            n el pin 3 
-   43 00000028 F8C8 7000       STR              R7,[R8]
-   44 0000002C         ;Se establece el Baudrate de la comunicación serial 
-   45 0000002C F44F 5616       MOV              R6,#9600
-   46 00000030 4F09            LDR              R7,=BRS     ; Se inicializa la 
-                                                            velocidad de comuni
-                                                            cación serial en 96
-                                                            00
-   47 00000032 603E            STR              R6,[R7]
-   48 00000034         ;Se hace un delay de 2 milisegundos (En este caso se esp
-                       eran 2 tiempos)
-   49 00000034 F04F 0602       MOV              R6,#2
-   50 00000038 B116    DL2     CBZ              R6,GDC      ;Básicamente lo sac
-                                                            a del loop cuando R
-                                                            6(contador del dela
-                                                            y en este caso) sea
-                                                             cero
-   51 0000003A F1A6 0601       SUB              R6,R6,#1
-   52 0000003E E7FB            B                DL2
-   53 00000040         
-   54 00000040         
-   55 00000040         
-   56 00000040         ; Paso #1  
-   57 00000040         ; Subrutina que se encarga de hacer el request GET de lo
-                       s datos de la cámara térmica y de la cámara de distancia
-                       
-   58 00000040         
-   59 00000040         
-   60 00000040 F04F 0C01 
-                       GDC     MOV              R12,1
-   61 00000044         
-   62 00000044         ;Paso #2
-   63 00000044         ; Subrutina que se encarga de hacer el request POST de l
-                       os datos obtenidos de las cámaras al Server del sistema
-   64 00000044         
-   65 00000044 F04F 0601 
+   21 00000000 20000018 
+                       EMC4    EQU              0x20000018  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el Enable Multiple
+                                                             Connections TCP de
+                                                            l Módulo Wifi Parte
+                                                             4
+   22 00000000 2000001C 
+                       EMC5    EQU              0x2000001C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el Enable Multiple
+                                                             Connections TCP de
+                                                            l Módulo Wifi Parte
+                                                             5
+   23 00000000 20000020 
+                       EMC6    EQU              0x20000020  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el Enable Multiple
+                                                             Connections TCP de
+                                                            l Módulo Wifi Parte
+                                                             6
+   24 00000000 20000024 
+                       TCPS1   EQU              0x20000024  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el TCP Start del M
+                                                            ódulo Wifi Parte 1
+   25 00000000 20000028 
+                       TCPS2   EQU              0x20000028  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el TCP Start del M
+                                                            ódulo Wifi Parte 2
+   26 00000000 2000002C 
+                       TCPS3   EQU              0x2000002C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el TCP Start del M
+                                                            ódulo Wifi Parte 3
+   27 00000000 20000030 
+                       TCPS4   EQU              0x20000030  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el TCP Start del M
+                                                            ódulo Wifi Parte 4
+   28 00000000 20000034 
+                       TCPS5   EQU              0x20000034  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el TCP Start del M
+                                                            ódulo Wifi Parte 5
+   29 00000000 20000038 
+                       TCPS6   EQU              0x20000038  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el TCP Start del M
+                                                            ódulo Wifi Parte 6
+   30 00000000 2000003C 
+                       TCPS7   EQU              0x2000003C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el TCP Start del M
+                                                            ódulo Wifi Parte 7 
+                                                            
+   31 00000000 20000040 
+                       TCP     EQU              0x20000040  ; Etiqueta del espa
 
 
 
 ARM Macro Assembler    Page 3 
 
 
+                                                            cio de memoria para
+                                                             el valor de activa
+                                                            ción de TCP 
+   32 00000000 20000044 
+                       IPS1    EQU              0x20000044  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la IP del Server P
+                                                            arte 1
+   33 00000000 20000048 
+                       IPS2    EQU              0x20000048  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la IP del Server P
+                                                            arte 2 
+   34 00000000 2000004C 
+                       IPS3    EQU              0x2000004C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la IP del Server P
+                                                            arte 3 
+   35 00000000 20000050 
+                       IPS4    EQU              0x20000050  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la IP del Server P
+                                                            arte 4
+   36 00000000 20000054 
+                       IPS5    EQU              0x20000054  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la IP del Server P
+                                                            arte 5
+   37 00000000 20000058 
+                       IPS6    EQU              0x20000058  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la IP del Server P
+                                                            arte 6 
+   38 00000000 2000005C 
+                       PTCP    EQU              0x2000005C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el puerto TCP de c
+                                                            omunicación con el 
+                                                            módulo de Wifi 
+   39 00000000 20000060 
+                       EDMW1   EQU              0x20000060  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el comando de Envi
+                                                            ar Datos por medio 
+                                                            del Módulo de Wifi 
+                                                            Parte 1
+   40 00000000 20000064 
+                       EDMW2   EQU              0x20000064  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el comando de Envi
+                                                            ar Datos por medio 
+                                                            del Módulo de Wifi 
+                                                            Parte 2
+   41 00000000 20000068 
+                       EDMW3   EQU              0x20000068  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el comando de Envi
+                                                            ar Datos por medio 
+                                                            del Módulo de Wifi 
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+                                                            Parte 3
+   42 00000000 2000006C 
+                       EDMW4   EQU              0x2000006C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el comando de Envi
+                                                            ar Datos por medio 
+                                                            del Módulo de Wifi 
+                                                            Parte 4
+   43 00000000 20000070 
+                       EDMW5   EQU              0x20000070  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el comando de Envi
+                                                            ar Datos por medio 
+                                                            del Módulo de Wifi 
+                                                            Parte 5
+   44 00000000 20000074 
+                       EDMW6   EQU              0x20000074  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el comando de Envi
+                                                            ar Datos por medio 
+                                                            del Módulo de Wifi 
+                                                            Parte 6
+   45 00000000 20000078 
+                       EDMW7   EQU              0x20000078  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             el comando de Envi
+                                                            ar Datos por medio 
+                                                            del Módulo de Wifi 
+                                                            Parte 7
+   46 00000000 2000007C 
+                       URL1    EQU              0x2000007C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 1
+   47 00000000 20000080 
+                       URL2    EQU              0x20000080  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 2
+   48 00000000 20000084 
+                       URL3    EQU              0x20000084  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 3
+   49 00000000 20000088 
+                       URL4    EQU              0x20000088  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 4
+   50 00000000 2000008C 
+                       URL5    EQU              0x2000008C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 5
+   51 00000000 20000090 
+                       URL6    EQU              0x20000090  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 6
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+   52 00000000 20000094 
+                       URL7    EQU              0x20000094  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 7
+   53 00000000 20000098 
+                       URL8    EQU              0x20000098  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 8
+   54 00000000 2000009C 
+                       URL9    EQU              0x2000009C  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 9
+   55 00000000 200000A0 
+                       URL10   EQU              0x200000A0  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 10
+   56 00000000 200000A4 
+                       URL11   EQU              0x200000A4  ; Etiqueta del espa
+                                                            cio de memoria para
+                                                             la URL de comunica
+                                                            ción Parte 11
+   57 00000000 200000A8 
+                       G4BS    EQU              0x200000A8  ; Etiqueta del espa
+                                                            cio de memoria que 
+                                                            represeta el GET de
+                                                             4 Bytes que se obt
+                                                            ienen a través de l
+                                                            a comunicación seri
+                                                            al
+   58 00000000 200000AC 
+                       DCT     EQU              0x200000AC  ; Etiqueta del espa
+                                                            cio de memoria que 
+                                                            indica el inicio do
+                                                            nde se almacenan lo
+                                                            s datos de la cámar
+                                                            a térmica
+   59 00000000 200002A0 
+                       DCDD    EQU              0x200002A0  ; Etiqueta del espa
+                                                            cio de memoria que 
+                                                            indica el inicio do
+                                                            nde se almacenan lo
+                                                            s datos de la cámar
+                                                            a de distancia
+   60 00000000         
+   61 00000000         
+   62 00000000         
+   63 00000000         
+   64 00000000         
+   65 00000000         ;Código del programa principal
+   66 00000000         
+   67 00000000                 AREA             Main, CODE, READONLY
+   68 00000000                 ENTRY
+   69 00000000                 EXPORT           __main
+   70 00000000         
+   71 00000000         __main
+
+
+
+ARM Macro Assembler    Page 6 
+
+
+   72 00000000         
+   73 00000000         ; Conjunto de Branches que representan el esqueleto del 
+                       código
+   74 00000000         
+   75 00000000 F000 F808       BL               SMW         ; Branch de la subr
+                                                            utina SMW = Setup d
+                                                            el Módulo de Wifi
+   76 00000004 F000 F823 
+                       INF     BL               GDC         ; Branch de la subr
+                                                            utina GDC = Get de 
+                                                            los Datos de las Cá
+                                                            maras
+   77 00000008 F000 F97C       BL               PDS         ; Branch de la subr
+                                                            utina PDS = Post de
+                                                             los Datos al Serve
+                                                            r
+   78 0000000C F000 F97C       BL               GMA         ; Branch de la subr
+                                                            utina GMA = Get del
+                                                             Mensaje y de la Al
+                                                            arma
+   79 00000010 F000 F97C       BL               EMA         ; Branch de la subr
+                                                            utina EMA = Escritu
+                                                            ra del Mensaje en e
+                                                            l LCD y activar las
+                                                             Alarmas
+   80 00000014         
+   81 00000014         
+   82 00000014         ; Paso #0
+   83 00000014         ; Subrutina que se encarga de hacer el setup de los pine
+                       s y las condiciones requeridas por el módulo de Wifi ESP
+                       8266
+   84 00000014         
+   85 00000014         ;Se establecen los pines en que va a funcionar el módulo
+                       
+   86 00000014 F04F 0602 
+                       SMW     MOV              R6,#2
+   87 00000018 F04F 0703       MOV              R7,#3
+   88 0000001C F04F 5800       LDR              R8,=RXPIN   ; RX se establce en
+                                                             el pin 2
+   89 00000020 F8C8 6000       STR              R6,[R8]
+   90 00000024 F8DF 82EC       LDR              R8,=TXPIN   ; TX se establece e
+                                                            n el pin 3 
+   91 00000028 F8C8 7000       STR              R7,[R8]
+   92 0000002C         ;Se establece el Baudrate de la comunicación serial 
+   93 0000002C F44F 5616       MOV              R6,#9600
+   94 00000030 4FB9            LDR              R7,=BRS     ; Se inicializa la 
+                                                            velocidad de comuni
+                                                            cación serial en 96
+                                                            00
+   95 00000032 603E            STR              R6,[R7]
+   96 00000034         
+   97 00000034         ;Se alamcena un valor simbólico en el espacio de memoria
+                        donde se obtendrían los 4 bytes al hacer un GET al Serv
+                       er del sistema
+   98 00000034 F64F 77FF       MOV              R7,0x0000FFFF
+   99 00000038 F8DF 82E0       LDR              R8,=G4BS
+  100 0000003C F8C8 7000       STR              R7,[R8]
+  101 00000040         
+  102 00000040         ;Se hace un delay de 2 milisegundos (En este caso se esp
+
+
+
+ARM Macro Assembler    Page 7 
+
+
+                       eran 2 tiempos simbólicos)
+  103 00000040 F04F 0602       MOV              R6,#2
+  104 00000044 B116    DL2     CBZ              R6,SMW2     ;Básicamente lo sac
+                                                            a del loop cuando R
+                                                            6(contador del dela
+                                                            y en este caso) sea
+                                                             cero
+  105 00000046 F1A6 0601       SUB              R6,R6,#1
+  106 0000004A E7FB            B                DL2         ; Ciclo DL2 = Delay
+                                                             de 2 tiempos
+  107 0000004C         
+  108 0000004C 4770    SMW2    BX               LR
+  109 0000004E         
+  110 0000004E         
+  111 0000004E         
+  112 0000004E         ; Paso #1  
+  113 0000004E         ; Subrutina que se encarga de hacer el request GET de lo
+                       s datos de la cámara térmica y de la cámara de distancia
+                       
+  114 0000004E         
+  115 0000004E         
+  116 0000004E         ; Establecer conexiones múltiples TCP en el módulo  Wifi
+                       , con el comando AT: AT+CIPMUX=1 = 0x41542B4349504D55583
+                       D31
+  117 0000004E F244 1754 
+                       GDC     MOV              R7, 0x4154
+  118 00000052 F8DF 82CC       LDR              R8,=EMC1
+  119 00000056 F8C8 7000       STR              R7,[R8]
+  120 0000005A F642 3743       MOV              R7,0x2B43
+  121 0000005E F8DF 82C4       LDR              R8,=EMC2
+  122 00000062 F8C8 7000       STR              R7,[R8]
+  123 00000066 F644 1750       MOV              R7,0x4950
+  124 0000006A F8DF 82BC       LDR              R8,=EMC3
+  125 0000006E F8C8 7000       STR              R7,[R8]
+  126 00000072 F644 5755       MOV              R7,0x4D55
+  127 00000076 F8DF 82B4       LDR              R8,=EMC4
+  128 0000007A F8C8 7000       STR              R7,[R8]
+  129 0000007E F645 073D       MOV              R7,0x583D
+  130 00000082 F8DF 82AC       LDR              R8,=EMC5
+  131 00000086 F8C8 7000       STR              R7,[R8]
+  132 0000008A F04F 0731       MOV              R7,0x31
+  133 0000008E F8DF 82A4       LDR              R8,=EMC6
+  134 00000092 F8C8 7000       STR              R7,[R8]
+  135 00000096         
+  136 00000096         
+  137 00000096         ; Se hace un delay de 1 milisegundo (En este caso se esp
+                       era 1 tiempo simbólico)
+  138 00000096 F04F 0701       MOV              R7,#1
+  139 0000009A B117    DL1     CBZ              R7,GDC2     ;Básicamente lo sac
+                                                            a del loop cuando R
+                                                            7(contador del dela
+                                                            y en este caso) sea
+                                                             cero
+  140 0000009C F1A7 0701       SUB              R7,R7,#1
+  141 000000A0 E7FB            B                DL1         ; Ciclo DL1 = Prime
+                                                            r Delay de 1 tiempo
+                                                            
+  142 000000A2         
+  143 000000A2         ; Se establece una conexión TCP cliente al servidor del 
+
+
+
+ARM Macro Assembler    Page 8 
+
+
+                       sistema, dando como párametros el IP del Server y el pue
+                       rto de comunicación
+  144 000000A2         ; Se utiliza el comando AT+CIPSTART=4 = 0x41542b43495053
+                       544152543d34 
+  145 000000A2         
+  146 000000A2 F244 1754 
+                       GDC2    MOV              R7, 0x4154
+  147 000000A6 F8DF 8290       LDR              R8,=TCPS1
+  148 000000AA F8C8 7000       STR              R7,[R8]
+  149 000000AE F642 3743       MOV              R7, 0x2B43
+  150 000000B2 F8DF 8288       LDR              R8,=TCPS2
+  151 000000B6 F8C8 7000       STR              R7,[R8]
+  152 000000BA F644 1750       MOV              R7, 0x4950
+  153 000000BE F8DF 8280       LDR              R8,=TCPS3
+  154 000000C2 F8C8 7000       STR              R7,[R8]
+  155 000000C6 F245 3754       MOV              R7, 0x5354
+  156 000000CA F8DF 8278       LDR              R8,=TCPS4
+  157 000000CE F8C8 7000       STR              R7,[R8]
+  158 000000D2 F244 1752       MOV              R7, 0x4152
+  159 000000D6 F8DF 8270       LDR              R8,=TCPS5
+  160 000000DA F8C8 7000       STR              R7,[R8]
+  161 000000DE F245 473D       MOV              R7, 0x543D
+  162 000000E2 F8DF 8268       LDR              R8,=TCPS6
+  163 000000E6 F8C8 7000       STR              R7,[R8]
+  164 000000EA F04F 0734       MOV              R7, 0x34
+  165 000000EE F8DF 8260       LDR              R8,=TCPS7
+  166 000000F2 F8C8 7000       STR              R7,[R8]
+  167 000000F6         
+  168 000000F6         ; Se establece el valor de TCP en 1 para indicar el tipo
+                        de conexión
+  169 000000F6 F04F 0701       MOV              R7, #1
+  170 000000FA F8DF 8258       LDR              R8,=TCP
+  171 000000FE F8C8 7000       STR              R7,[R8]
+  172 00000102         
+  173 00000102         ; Se establece el valor de la IP:192.168.1.19 = 0x313932
+                       2e3136382e312e310a
+  174 00000102 F243 1739       MOV              R7, 0x3139
+  175 00000106 F8DF 8250       LDR              R8,=IPS1
+  176 0000010A F8C8 7000       STR              R7,[R8]
+  177 0000010E F243 272E       MOV              R7, 0x322E
+  178 00000112 F8DF 8248       LDR              R8,=IPS2
+  179 00000116 F8C8 7000       STR              R7,[R8]
+  180 0000011A F243 1736       MOV              R7, 0x3136
+  181 0000011E F8DF 8240       LDR              R8,=IPS3
+  182 00000122 F8C8 7000       STR              R7,[R8]
+  183 00000126 F643 072E       MOV              R7, 0x382E
+  184 0000012A F8DF 8238       LDR              R8,=IPS4
+  185 0000012E F8C8 7000       STR              R7,[R8]
+  186 00000132 F243 172E       MOV              R7, 0x312E
+  187 00000136 F8DF 8230       LDR              R8,=IPS5
+  188 0000013A F8C8 7000       STR              R7,[R8]
+  189 0000013E F243 170A       MOV              R7, 0x310A
+  190 00000142 F8DF 8228       LDR              R8,=IPS6
+  191 00000146 F8C8 7000       STR              R7,[R8]
+  192 0000014A         
+  193 0000014A         ; Se define el puerto de comunicación EN 8080
+  194 0000014A F641 7790       MOV              R7, #8080
+  195 0000014E F8DF 8220       LDR              R8,=PTCP
+  196 00000152 F8C8 7000       STR              R7,[R8]
+
+
+
+ARM Macro Assembler    Page 9 
+
+
+  197 00000156         
+  198 00000156         ; Se hace un delay de 1 milisegundo (En este caso se esp
+                       era 1 tiempo simbólico)
+  199 00000156 F04F 0701       MOV              R7,#1
+  200 0000015A B117    DL12    CBZ              R7,GDC3     ;Básicamente lo sac
+                                                            a del loop cuando R
+                                                            7(contador del dela
+                                                            y en este caso) sea
+                                                             cero
+  201 0000015C F1A7 0701       SUB              R7,R7,#1
+  202 00000160 E7FB            B                DL12        ; Ciclo DL12 = Segu
+                                                            ndo Delay de 1 tiem
+                                                            po
+  203 00000162         
+  204 00000162         ;Establecer el comando AT para poder enviar datos atravé
+                       s del módulo de wifi
+  205 00000162         ;En este caso se utiliza el comando AT+CIPSEND=4 : 0x415
+                       42b43495053454e443d340a
+  206 00000162 F244 1754 
+                       GDC3    MOV              R7, 0x4154
+  207 00000166 F8DF 820C       LDR              R8,=EDMW1
+  208 0000016A F8C8 7000       STR              R7,[R8]
+  209 0000016E F642 3743       MOV              R7, 0x2B43
+  210 00000172 F8DF 8204       LDR              R8,=EDMW2
+  211 00000176 F8C8 7000       STR              R7,[R8]
+  212 0000017A F644 1750       MOV              R7, 0x4950
+  213 0000017E F8DF 81FC       LDR              R8,=EDMW3
+  214 00000182 F8C8 7000       STR              R7,[R8]
+  215 00000186 F245 3745       MOV              R7, 0x5345
+  216 0000018A F8DF 81F4       LDR              R8,=EDMW4
+  217 0000018E F8C8 7000       STR              R7,[R8]
+  218 00000192 F644 6744       MOV              R7, 0x4E44
+  219 00000196 F8DF 81EC       LDR              R8,=EDMW5
+  220 0000019A F8C8 7000       STR              R7,[R8]
+  221 0000019E F643 5734       MOV              R7, 0x3D34
+  222 000001A2 F8DF 81E4       LDR              R8,=EDMW6
+  223 000001A6 F8C8 7000       STR              R7,[R8]
+  224 000001AA F04F 070A       MOV              R7, 0x0A
+  225 000001AE F8DF 81DC       LDR              R8,=EDMW7
+  226 000001B2 F8C8 7000       STR              R7,[R8]
+  227 000001B6         
+  228 000001B6         ;Establecer la URL de Envío, que en este caso correspond
+                       e con la Operación GET, para obtener los datos de la cám
+                       ara térmica
+  229 000001B6         ; GET/CT.html HTTP/1.1 = 0x4745542f43542e68746d6c2048545
+                       4502f312e31
+  230 000001B6 F244 7745       MOV              R7, 0x4745
+  231 000001BA F8DF 81D4       LDR              R8,=URL1
+  232 000001BE F8C8 7000       STR              R7,[R8]
+  233 000001C2 F245 472F       MOV              R7, 0x542F
+  234 000001C6 F8DF 81CC       LDR              R8,=URL2
+  235 000001CA F8C8 7000       STR              R7,[R8]
+  236 000001CE F244 3754       MOV              R7, 0x4354
+  237 000001D2 F8DF 81C4       LDR              R8,=URL3
+  238 000001D6 F8C8 7000       STR              R7,[R8]
+  239 000001DA F642 6768       MOV              R7, 0x2E68
+  240 000001DE F8DF 81BC       LDR              R8,=URL4
+  241 000001E2 F8C8 7000       STR              R7,[R8]
+  242 000001E6 F247 476D       MOV              R7, 0x746D
+
+
+
+ARM Macro Assembler    Page 10 
+
+
+  243 000001EA F8DF 81B4       LDR              R8,=URL5
+  244 000001EE F8C8 7000       STR              R7,[R8]
+  245 000001F2 F646 4720       MOV              R7, 0x6C20
+  246 000001F6 F8DF 81AC       LDR              R8,=URL6
+  247 000001FA F8C8 7000       STR              R7,[R8]
+  248 000001FE F644 0754       MOV              R7, 0x4854
+  249 00000202 F8DF 81A4       LDR              R8,=URL7
+  250 00000206 F8C8 7000       STR              R7,[R8]
+  251 0000020A F245 4750       MOV              R7, 0x5450
+  252 0000020E F8DF 819C       LDR              R8,=URL8
+  253 00000212 F8C8 7000       STR              R7,[R8]
+  254 00000216 F642 7731       MOV              R7, 0x2F31
+  255 0000021A F8DF 8194       LDR              R8,=URL9
+  256 0000021E F8C8 7000       STR              R7,[R8]
+  257 00000222 F642 6731       MOV              R7, 0x2E31
+  258 00000226 F8DF 818C       LDR              R8,=URL10
+  259 0000022A F8C8 7000       STR              R7,[R8]
+  260 0000022E         
+  261 0000022E         
+  262 0000022E         ; Se hace un delay de 1 milisegundo (En este caso se esp
+                       era 1 tiempo simbólico)
+  263 0000022E F04F 0701       MOV              R7,#1
+  264 00000232 B117    DL13    CBZ              R7,GDC4     ;Básicamente lo sac
+                                                            a del loop cuando R
+                                                            7(contador del dela
+                                                            y en este caso) sea
+                                                             cero
+  265 00000234 F1A7 0701       SUB              R7,R7,#1
+  266 00000238 E7FB            B                DL13        ; Ciclo DL13 = Terc
+                                                            er Delay de 1 tiemp
+                                                            o
+  267 0000023A         
+  268 0000023A         
+  269 0000023A         
+  270 0000023A         ; Ciclo que realiza el GET de los datos de la cámara tér
+                       mica
+  271 0000023A F04F 0600 
+                       GDC4    MOV              R6,#0       ; Se establece el c
+                                                            ontador en 0
+  272 0000023E 4F37            LDR              R7,=G4BS    ; Se carga en R7 la
+                                                             dirección de memor
+                                                            ia donde se obtiene
+                                                            n los datos del GET
+                                                            
+  273 00000240         
+  274 00000240 F5B6 7FFA 
+                       GDC5    CMP              R6,#500     ; El valor real es 
+                                                            153600, para efecto
+                                                            s de prueba se deja
+                                                             en 500
+  275 00000244 D007            BEQ              GDC6
+  276 00000246 BF1F 6838       LDRNE            CT,[R7]     ; Se almacena el co
+                                                            ntenido de la direc
+                                                            ción guardada en R7
+                                                             en el registro de 
+                                                            la cámara térmica
+  277 0000024A F8DF 816C       LDRNE            R8,=DCT     ; Se almacena en R8
+                                                             la dirección de me
+                                                            moria donde se alma
+
+
+
+ARM Macro Assembler    Page 11 
+
+
+                                                            cenan los datos de 
+                                                            la cámara térmica
+  278 0000024E         ;Para guardar los datos de la cámara se usa como base el
+                        valor inicial de R8 y se le suma el offset correspondie
+                       nte al valor actual del contador
+  279 0000024E F848 0006       STRNE            CT,[R8,R6]  ; Se guarda lo que 
+                                                            hay en el registro 
+                                                            de la cámara térmic
+                                                            a en la dirección d
+                                                            e memoria correspon
+                                                            diente
+  280 00000252 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
+                                                            contador en 4, que 
+                                                            es tamaño de los bl
+                                                            oques de memoria (4
+                                                             bytes)
+  281 00000254 D1F4            BNE              GDC5
+  282 00000256         
+  283 00000256         
+  284 00000256         ;Establecer la URL de Envío, que en este caso correspond
+                       e con la Operación GET, para obtener los datos de la cám
+                       ara de distancia
+  285 00000256         ;GET/CD.html HTTP/1.1 = 0x4745542f43442e68746d6c20485454
+                       502f312e31
+  286 00000256 F244 7745 
+                       GDC6    MOV              R7, 0x4745
+  287 0000025A F8DF 8134       LDR              R8,=URL1
+  288 0000025E F8C8 7000       STR              R7,[R8]
+  289 00000262 F245 472F       MOV              R7, 0x542F
+  290 00000266 F8DF 812C       LDR              R8,=URL2
+  291 0000026A F8C8 7000       STR              R7,[R8]
+  292 0000026E F244 3744       MOV              R7, 0x4344
+  293 00000272 F8DF 8124       LDR              R8,=URL3
+  294 00000276 F8C8 7000       STR              R7,[R8]
+  295 0000027A F642 6768       MOV              R7, 0x2E68
+  296 0000027E F8DF 811C       LDR              R8,=URL4
+  297 00000282 F8C8 7000       STR              R7,[R8]
+  298 00000286 F247 476D       MOV              R7, 0x746D
+  299 0000028A F8DF 8114       LDR              R8,=URL5
+  300 0000028E F8C8 7000       STR              R7,[R8]
+  301 00000292 F646 4720       MOV              R7, 0x6C20
+  302 00000296 F8DF 810C       LDR              R8,=URL6
+  303 0000029A F8C8 7000       STR              R7,[R8]
+  304 0000029E F644 0754       MOV              R7, 0x4854
+  305 000002A2 F8DF 8104       LDR              R8,=URL7
+  306 000002A6 F8C8 7000       STR              R7,[R8]
+  307 000002AA F245 4750       MOV              R7, 0x5450
+  308 000002AE F8DF 80FC       LDR              R8,=URL8
+  309 000002B2 F8C8 7000       STR              R7,[R8]
+  310 000002B6 F642 7731       MOV              R7, 0x2F31
+  311 000002BA F8DF 80F4       LDR              R8,=URL9
+  312 000002BE F8C8 7000       STR              R7,[R8]
+  313 000002C2 F642 6731       MOV              R7, 0x2E31
+  314 000002C6 F8DF 80EC       LDR              R8,=URL10
+  315 000002CA F8C8 7000       STR              R7,[R8]
+  316 000002CE         
+  317 000002CE         ; Se hace un delay de 1 milisegundo (En este caso se esp
+                       era 1 tiempo simbólico)
+  318 000002CE F04F 0701       MOV              R7,#1
+
+
+
+ARM Macro Assembler    Page 12 
+
+
+  319 000002D2 B117    DL14    CBZ              R7,GDC7     ;Básicamente lo sac
+                                                            a del loop cuando R
+                                                            7(contador del dela
+                                                            y en este caso) sea
+                                                             cero
+  320 000002D4 F1A7 0701       SUB              R7,R7,#1
+  321 000002D8 E7FB            B                DL14        ; Ciclo DL14 = Cuar
+                                                            to Delay de 1 tiemp
+                                                            o
+  322 000002DA         
+  323 000002DA         
+  324 000002DA         ;Ciclo que realiza el GET de los datos de la cámara de d
+                       istancia
+  325 000002DA         ;Se almacena otro valor simbólico en el espacio de memor
+                       ia donde se obtendrían los 4 bytes al hacer un GET al Se
+                       rver del sistema. Esto para revisar en memoria y simular
+                        el envío de datos distintos
+  326 000002DA F64D 57DD 
+                       GDC7    MOV              R7,0x0000DDDD
+  327 000002DE F8DF 803C       LDR              R8,=G4BS
+  328 000002E2 F8C8 7000       STR              R7,[R8]
+  329 000002E6 F04F 0600       MOV              R6,#0       ; Se establece el c
+                                                            ontador en 0
+  330 000002EA 4F0C            LDR              R7,=G4BS    ; Se carga en R7 la
+                                                             dirección de memor
+                                                            ia donde se obtiene
+                                                            n los datos del GET
+                                                            
+  331 000002EC         
+  332 000002EC F5B6 7FFA 
+                       GDC8    CMP              R6,#500     ; El valor real es 
+                                                            4147200, para efect
+                                                            os de prueba se dej
+                                                            a en 500
+  333 000002F0 D007            BEQ              GDC9
+  334 000002F2 BF1F 6839       LDRNE            CD,[R7]     ; Se almacena el co
+                                                            ntenido de la direc
+                                                            ción guardada en R7
+                                                             en el registro de 
+                                                            la cámara de distan
+                                                            cia
+  335 000002F6 F8DF 80C4       LDRNE            R8,=DCDD    ; Se almacena en R8
+                                                             la dirección de me
+                                                            moria donde se alma
+                                                            cenan los datos de 
+                                                            la cámara de distan
+                                                            cia
+  336 000002FA         ;Para guardar los datos de la cámara se usa como base el
+                        valor inicial de R8 y se le suma el offset correspondie
+                       nte al valor actual del contador
+  337 000002FA F848 1006       STRNE            CD,[R8,R6]  ; Se guarda lo que 
+                                                            hay en el registro 
+                                                            de la cámara de dis
+                                                            tancia en la direcc
+                                                            ión de memoria corr
+                                                            espondiente
+  338 000002FE 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
+                                                            contador en 4, que 
+                                                            es tamaño de los bl
+
+
+
+ARM Macro Assembler    Page 13 
+
+
+                                                            oques de memoria (4
+                                                             bytes)
+  339 00000300 D1F4            BNE              GDC8
+  340 00000302         
+  341 00000302 4770    GDC9    BX               LR
+  342 00000304         
+  343 00000304         
+  344 00000304         
+  345 00000304         ;Paso #2
+  346 00000304         ; Subrutina que se encarga de hacer el request POST de l
+                       os datos obtenidos de las cámaras al Server del sistema
+  347 00000304         
+  348 00000304 F04F 0601 
                        PDS     MOV              R6,1
-   66 00000048         
-   67 00000048         ;Paso #3
-   68 00000048         ; Subrutina que se encarga de hacer el request GET al Se
+  349 00000308         
+  350 00000308         ;Paso #3
+  351 00000308         ; Subrutina que se encarga de hacer el request GET al Se
                        rver del Mensaje de que se proyectará en el LCD y del có
                        digo de activación de las alarmas
-   69 00000048         
-   70 00000048 F04F 0701 
+  352 00000308         
+  353 00000308 F04F 0701 
                        GMA     MOV              R7,1
-   71 0000004C         
-   72 0000004C         
-   73 0000004C         ; Paso #4
-   74 0000004C         ; Subrutina que se encarga de mandar al LCD el mensaje o
+  354 0000030C         
+  355 0000030C         
+  356 0000030C         ; Paso #4
+  357 0000030C         ; Subrutina que se encarga de mandar al LCD el mensaje o
                        btenido através del servidor y de activar o no las alarm
                        as dependiendo de lo obtenido por el Server
-   75 0000004C         
-   76 0000004C F04F 0800 
+  358 0000030C         
+  359 0000030C F04F 0800 
                        EMA     MOV              R8,0
-   77 00000050 F7FF FFD8       BL               INF         ; Se regresa al Bra
+  360 00000310 F7FF FE78       BL               INF         ; Se regresa al Bra
                                                             nch INF para genera
                                                             r un loop infinito
-   78 00000054         
-   79 00000054                 END
+  361 00000314         
+  362 00000314                 END
               20000004 
               20000008 
+              200000A8 
+              2000000C 
+              20000010 
+              20000014 
+              20000018 
+              2000001C 
+              20000020 
+              20000024 
+              20000028 
+              2000002C 
+              20000030 
+              20000034 
+              20000038 
+              2000003C 
+              20000040 
+              20000044 
+              20000048 
+              2000004C 
+              20000050 
+              20000054 
+              20000058 
+
+
+
+ARM Macro Assembler    Page 14 
+
+
+              2000005C 
+              20000060 
+              20000064 
+              20000068 
+              2000006C 
+              20000070 
+              20000074 
+              20000078 
+              2000007C 
+              20000080 
+              20000084 
+              20000088 
+              2000008C 
+              20000090 
+              20000094 
+              20000098 
+              2000009C 
+              200000A0 
+              200000AC 
+              200002A0 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend=.\objects\main.d -o.\objects\main.o -I.\RTE\_Cortex-M3 -IC:\Users\
 User\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Users\User
@@ -172,86 +882,195 @@ ngs\main.lst main.s
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
-DL2 00000038
+DL1 0000009A
+
+Symbol: DL1
+   Definitions
+      At line 139 in file main.s
+   Uses
+      At line 141 in file main.s
+Comment: DL1 used once
+DL12 0000015A
+
+Symbol: DL12
+   Definitions
+      At line 200 in file main.s
+   Uses
+      At line 202 in file main.s
+Comment: DL12 used once
+DL13 00000232
+
+Symbol: DL13
+   Definitions
+      At line 264 in file main.s
+   Uses
+      At line 266 in file main.s
+Comment: DL13 used once
+DL14 000002D2
+
+Symbol: DL14
+   Definitions
+      At line 319 in file main.s
+   Uses
+      At line 321 in file main.s
+Comment: DL14 used once
+DL2 00000044
 
 Symbol: DL2
    Definitions
-      At line 50 in file main.s
+      At line 104 in file main.s
    Uses
-      At line 52 in file main.s
+      At line 106 in file main.s
 Comment: DL2 used once
-EMA 0000004C
+EMA 0000030C
 
 Symbol: EMA
    Definitions
-      At line 76 in file main.s
+      At line 359 in file main.s
    Uses
-      At line 31 in file main.s
+      At line 79 in file main.s
 Comment: EMA used once
-GDC 00000040
+GDC 0000004E
 
 Symbol: GDC
    Definitions
-      At line 60 in file main.s
+      At line 117 in file main.s
    Uses
-      At line 28 in file main.s
-      At line 50 in file main.s
+      At line 76 in file main.s
+Comment: GDC used once
+GDC2 000000A2
 
-GMA 00000048
-
-Symbol: GMA
-   Definitions
-      At line 70 in file main.s
-   Uses
-      At line 30 in file main.s
-Comment: GMA used once
-INF 00000004
-
-Symbol: INF
-   Definitions
-      At line 28 in file main.s
-   Uses
-      At line 77 in file main.s
-Comment: INF used once
-Main 00000000
-
-Symbol: Main
-   Definitions
-      At line 19 in file main.s
-   Uses
-      None
-Comment: Main unused
-PDS 00000044
-
-Symbol: PDS
-   Definitions
-      At line 65 in file main.s
-   Uses
-      At line 29 in file main.s
-Comment: PDS used once
-SMW 00000014
-
+Symbol: GDC2
 
 
 
 ARM Macro Assembler    Page 2 Alphabetic symbol ordering
 Relocatable symbols
 
+   Definitions
+      At line 146 in file main.s
+   Uses
+      At line 139 in file main.s
+Comment: GDC2 used once
+GDC3 00000162
+
+Symbol: GDC3
+   Definitions
+      At line 206 in file main.s
+   Uses
+      At line 200 in file main.s
+Comment: GDC3 used once
+GDC4 0000023A
+
+Symbol: GDC4
+   Definitions
+      At line 271 in file main.s
+   Uses
+      At line 264 in file main.s
+Comment: GDC4 used once
+GDC5 00000240
+
+Symbol: GDC5
+   Definitions
+      At line 274 in file main.s
+   Uses
+      At line 281 in file main.s
+Comment: GDC5 used once
+GDC6 00000256
+
+Symbol: GDC6
+   Definitions
+      At line 286 in file main.s
+   Uses
+      At line 275 in file main.s
+Comment: GDC6 used once
+GDC7 000002DA
+
+Symbol: GDC7
+   Definitions
+      At line 326 in file main.s
+   Uses
+      At line 319 in file main.s
+Comment: GDC7 used once
+GDC8 000002EC
+
+Symbol: GDC8
+   Definitions
+      At line 332 in file main.s
+   Uses
+      At line 339 in file main.s
+Comment: GDC8 used once
+GDC9 00000302
+
+Symbol: GDC9
+   Definitions
+      At line 341 in file main.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 333 in file main.s
+Comment: GDC9 used once
+GMA 00000308
+
+Symbol: GMA
+   Definitions
+      At line 353 in file main.s
+   Uses
+      At line 78 in file main.s
+Comment: GMA used once
+INF 00000004
+
+Symbol: INF
+   Definitions
+      At line 76 in file main.s
+   Uses
+      At line 360 in file main.s
+Comment: INF used once
+Main 00000000
+
+Symbol: Main
+   Definitions
+      At line 67 in file main.s
+   Uses
+      None
+Comment: Main unused
+PDS 00000304
+
+Symbol: PDS
+   Definitions
+      At line 348 in file main.s
+   Uses
+      At line 77 in file main.s
+Comment: PDS used once
+SMW 00000014
+
 Symbol: SMW
    Definitions
-      At line 38 in file main.s
+      At line 86 in file main.s
    Uses
-      At line 27 in file main.s
+      At line 75 in file main.s
 Comment: SMW used once
+SMW2 0000004C
+
+Symbol: SMW2
+   Definitions
+      At line 108 in file main.s
+   Uses
+      At line 104 in file main.s
+Comment: SMW2 used once
 __main 00000000
 
 Symbol: __main
    Definitions
-      At line 23 in file main.s
+      At line 71 in file main.s
    Uses
-      At line 21 in file main.s
+      At line 69 in file main.s
 Comment: __main used once
-9 symbols
+22 symbols
 
 
 
@@ -262,10 +1081,142 @@ BRS 20000008
 
 Symbol: BRS
    Definitions
-      At line 12 in file main.s
+      At line 17 in file main.s
    Uses
-      At line 46 in file main.s
+      At line 94 in file main.s
 Comment: BRS used once
+DCDD 200002A0
+
+Symbol: DCDD
+   Definitions
+      At line 59 in file main.s
+   Uses
+      At line 335 in file main.s
+Comment: DCDD used once
+DCT 200000AC
+
+Symbol: DCT
+   Definitions
+      At line 58 in file main.s
+   Uses
+      At line 277 in file main.s
+Comment: DCT used once
+EDMW1 20000060
+
+Symbol: EDMW1
+   Definitions
+      At line 39 in file main.s
+   Uses
+      At line 207 in file main.s
+Comment: EDMW1 used once
+EDMW2 20000064
+
+Symbol: EDMW2
+   Definitions
+      At line 40 in file main.s
+   Uses
+      At line 210 in file main.s
+Comment: EDMW2 used once
+EDMW3 20000068
+
+Symbol: EDMW3
+   Definitions
+      At line 41 in file main.s
+   Uses
+      At line 213 in file main.s
+Comment: EDMW3 used once
+EDMW4 2000006C
+
+Symbol: EDMW4
+   Definitions
+      At line 42 in file main.s
+   Uses
+      At line 216 in file main.s
+Comment: EDMW4 used once
+EDMW5 20000070
+
+Symbol: EDMW5
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Absolute symbols
+
+   Definitions
+      At line 43 in file main.s
+   Uses
+      At line 219 in file main.s
+Comment: EDMW5 used once
+EDMW6 20000074
+
+Symbol: EDMW6
+   Definitions
+      At line 44 in file main.s
+   Uses
+      At line 222 in file main.s
+Comment: EDMW6 used once
+EDMW7 20000078
+
+Symbol: EDMW7
+   Definitions
+      At line 45 in file main.s
+   Uses
+      At line 225 in file main.s
+Comment: EDMW7 used once
+EMC1 2000000C
+
+Symbol: EMC1
+   Definitions
+      At line 18 in file main.s
+   Uses
+      At line 118 in file main.s
+Comment: EMC1 used once
+EMC2 20000010
+
+Symbol: EMC2
+   Definitions
+      At line 19 in file main.s
+   Uses
+      At line 121 in file main.s
+Comment: EMC2 used once
+EMC3 20000014
+
+Symbol: EMC3
+   Definitions
+      At line 20 in file main.s
+   Uses
+      At line 124 in file main.s
+Comment: EMC3 used once
+EMC4 20000018
+
+Symbol: EMC4
+   Definitions
+      At line 21 in file main.s
+   Uses
+      At line 127 in file main.s
+Comment: EMC4 used once
+EMC5 2000001C
+
+Symbol: EMC5
+   Definitions
+      At line 22 in file main.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Absolute symbols
+
+      At line 130 in file main.s
+Comment: EMC5 used once
+EMC6 20000020
+
+Symbol: EMC6
+   Definitions
+      At line 23 in file main.s
+   Uses
+      At line 133 in file main.s
+Comment: EMC6 used once
 FALSE 00000000
 
 Symbol: FALSE
@@ -274,14 +1225,157 @@ Symbol: FALSE
    Uses
       None
 Comment: FALSE unused
+G4BS 200000A8
+
+Symbol: G4BS
+   Definitions
+      At line 57 in file main.s
+   Uses
+      At line 99 in file main.s
+      At line 272 in file main.s
+      At line 327 in file main.s
+      At line 330 in file main.s
+
+IPS1 20000044
+
+Symbol: IPS1
+   Definitions
+      At line 32 in file main.s
+   Uses
+      At line 175 in file main.s
+Comment: IPS1 used once
+IPS2 20000048
+
+Symbol: IPS2
+   Definitions
+      At line 33 in file main.s
+   Uses
+      At line 178 in file main.s
+Comment: IPS2 used once
+IPS3 2000004C
+
+Symbol: IPS3
+   Definitions
+      At line 34 in file main.s
+   Uses
+      At line 181 in file main.s
+Comment: IPS3 used once
+IPS4 20000050
+
+Symbol: IPS4
+   Definitions
+      At line 35 in file main.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Absolute symbols
+
+      At line 184 in file main.s
+Comment: IPS4 used once
+IPS5 20000054
+
+Symbol: IPS5
+   Definitions
+      At line 36 in file main.s
+   Uses
+      At line 187 in file main.s
+Comment: IPS5 used once
+IPS6 20000058
+
+Symbol: IPS6
+   Definitions
+      At line 37 in file main.s
+   Uses
+      At line 190 in file main.s
+Comment: IPS6 used once
+PTCP 2000005C
+
+Symbol: PTCP
+   Definitions
+      At line 38 in file main.s
+   Uses
+      At line 195 in file main.s
+Comment: PTCP used once
 RXPIN 20000000
 
 Symbol: RXPIN
    Definitions
-      At line 10 in file main.s
+      At line 15 in file main.s
    Uses
-      At line 40 in file main.s
+      At line 88 in file main.s
 Comment: RXPIN used once
+TCP 20000040
+
+Symbol: TCP
+   Definitions
+      At line 31 in file main.s
+   Uses
+      At line 170 in file main.s
+Comment: TCP used once
+TCPS1 20000024
+
+Symbol: TCPS1
+   Definitions
+      At line 24 in file main.s
+   Uses
+      At line 147 in file main.s
+Comment: TCPS1 used once
+TCPS2 20000028
+
+Symbol: TCPS2
+   Definitions
+      At line 25 in file main.s
+   Uses
+      At line 150 in file main.s
+Comment: TCPS2 used once
+TCPS3 2000002C
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Absolute symbols
+
+
+Symbol: TCPS3
+   Definitions
+      At line 26 in file main.s
+   Uses
+      At line 153 in file main.s
+Comment: TCPS3 used once
+TCPS4 20000030
+
+Symbol: TCPS4
+   Definitions
+      At line 27 in file main.s
+   Uses
+      At line 156 in file main.s
+Comment: TCPS4 used once
+TCPS5 20000034
+
+Symbol: TCPS5
+   Definitions
+      At line 28 in file main.s
+   Uses
+      At line 159 in file main.s
+Comment: TCPS5 used once
+TCPS6 20000038
+
+Symbol: TCPS6
+   Definitions
+      At line 29 in file main.s
+   Uses
+      At line 162 in file main.s
+Comment: TCPS6 used once
+TCPS7 2000003C
+
+Symbol: TCPS7
+   Definitions
+      At line 30 in file main.s
+   Uses
+      At line 165 in file main.s
+Comment: TCPS7 used once
 TRUE 00000001
 
 Symbol: TRUE
@@ -294,9 +1388,119 @@ TXPIN 20000004
 
 Symbol: TXPIN
    Definitions
-      At line 11 in file main.s
+      At line 16 in file main.s
    Uses
-      At line 42 in file main.s
+      At line 90 in file main.s
 Comment: TXPIN used once
-5 symbols
-351 symbols in table
+URL1 2000007C
+
+Symbol: URL1
+   Definitions
+
+
+
+ARM Macro Assembler    Page 6 Alphabetic symbol ordering
+Absolute symbols
+
+      At line 46 in file main.s
+   Uses
+      At line 231 in file main.s
+      At line 287 in file main.s
+
+URL10 200000A0
+
+Symbol: URL10
+   Definitions
+      At line 55 in file main.s
+   Uses
+      At line 258 in file main.s
+      At line 314 in file main.s
+
+URL11 200000A4
+
+Symbol: URL11
+   Definitions
+      At line 56 in file main.s
+   Uses
+      None
+Comment: URL11 unused
+URL2 20000080
+
+Symbol: URL2
+   Definitions
+      At line 47 in file main.s
+   Uses
+      At line 234 in file main.s
+      At line 290 in file main.s
+
+URL3 20000084
+
+Symbol: URL3
+   Definitions
+      At line 48 in file main.s
+   Uses
+      At line 237 in file main.s
+      At line 293 in file main.s
+
+URL4 20000088
+
+Symbol: URL4
+   Definitions
+      At line 49 in file main.s
+   Uses
+      At line 240 in file main.s
+      At line 296 in file main.s
+
+URL5 2000008C
+
+Symbol: URL5
+   Definitions
+      At line 50 in file main.s
+   Uses
+      At line 243 in file main.s
+      At line 299 in file main.s
+
+URL6 20000090
+
+
+
+ARM Macro Assembler    Page 7 Alphabetic symbol ordering
+Absolute symbols
+
+
+Symbol: URL6
+   Definitions
+      At line 51 in file main.s
+   Uses
+      At line 246 in file main.s
+      At line 302 in file main.s
+
+URL7 20000094
+
+Symbol: URL7
+   Definitions
+      At line 52 in file main.s
+   Uses
+      At line 249 in file main.s
+      At line 305 in file main.s
+
+URL8 20000098
+
+Symbol: URL8
+   Definitions
+      At line 53 in file main.s
+   Uses
+      At line 252 in file main.s
+      At line 308 in file main.s
+
+URL9 2000009C
+
+Symbol: URL9
+   Definitions
+      At line 54 in file main.s
+   Uses
+      At line 255 in file main.s
+      At line 311 in file main.s
+
+47 symbols
+408 symbols in table
