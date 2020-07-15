@@ -1,18 +1,18 @@
-;Se asignan etiquetas para las constantes de 0 y 1 que se usaran para mostrar el valor de los outputs que irán a las alarmas
+; Se asignan etiquetas para las constantes de 0 y 1 que se usaran para mostrar el valor de los outputs que irán a las alarmas
 
 TRUE		EQU		1
 FALSE		EQU		0
 	
 ; Se renombran los registros que se van a utilizar como variables
-CT			RN		R0
-CD			RN		R1
-AS			RN		R2
-MS			RN		R3
+CT			RN		R0 ; CT: Cámara Térmica 
+CD			RN		R1 ; CD: Cámara de Distancia	
+AS			RN		R2 ; AS: Alarmas provenientes del Server
+MS			RN		R3 ; MS: Mensaje del Server que se imprimirá en el LCD
 
 	
-; Se asignan etiquetas para los espacios de memoria RAM donde se almacenaran los ouputs del sistema
+; Se asignan etiquetas para los espacios de memoria RAM donde se almacenarán los ouputs del sistema
 ; La memoria RAM comienza en la dirección 0x20000000
-;Cada dirección de memoria apunta a un bloque de 4 bytes de tamaño
+; Cada dirección de memoria apunta a un bloque de 4 bytes de tamaño
 
 RXPIN		EQU		0x20000000  ; Etiqueta del espacio de memoria donde se asigna el pin RX del ESP8266
 TXPIN		EQU		0x20000004  ; Etiqueta del espacio de memoria donde se asigna el pin TX del ESP8266
@@ -61,10 +61,10 @@ DCT			EQU		0x200000AC  ; Etiqueta del espacio de memoria que indica el inicio do
 DCDD		EQU		0x200002A0	; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cámara de distancia
 P4BS		EQU		0x20000494	; Etiqueta del espacio de memoria que representa el POST de 4 Bytes que se mandan a través de la comunicación serial
 DMS			EQU		0x20000498  ; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos del mensaje obtenido por el server
-DAS			EQU		0x200004C4	; Etiqueta del espacio de memoria donde se almacena el activador de las alarmas de acuerdo a lo que diga el Server 
+DAS			EQU		0x200004C4	; Etiqueta del espacio de memoria donde se almacena el activador de las alarmas de acuerdo a lo que diga el server 
 
 
-;Código del programa principal
+; Código del programa principal
 
 		AREA Main, CODE, READONLY
 		ENTRY
@@ -91,22 +91,23 @@ SMW		MOV R6,#2
 		STR R6,[R8]
 		LDR R8,=TXPIN ; TX se establece en el pin 3 
 		STR R7,[R8]
-		;Se establece el Baudrate de la comunicación serial 
+		
+		; Se establece el Baudrate de la comunicación serial 
 		MOV R6,#9600
 		LDR R7,=BRS ; Se inicializa la velocidad de comunicación serial en 9600
 		LTORG
 		STR R6,[R7]
 		
-		;Se alamcena un valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema
+		; Se alamcena un valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema
 		MOV R7,0x0000FFFF
 		LDR R8,=G4BS
 		STR R7,[R8]
 		
-		;Se hace un delay de 2 milisegundos (En este caso se esperan 2 tiempos simbólicos)
+		; Se hace un delay de 2 milisegundos (En este caso se esperan 2 tiempos simbólicos)
 		MOV R6,#2
-DL2		CBZ	R6,SMW2  ;Básicamente lo saca del loop cuando R6(contador del delay en este caso) sea cero
+DL2		CBZ	R6,SMW2  ; Básicamente lo saca del loop cuando R6(contador del delay en este caso) sea cero
 		SUB R6,R6,#1
-		B	DL2 ; Ciclo DL2 = Delay de 2 tiempos
+		B	DL2      ; Ciclo DL2 = Delay de 2 tiempos
 				
 		
 		; Establecer conexiones múltiples TCP en el módulo  Wifi, con el comando AT: AT+CIPMUX=1 = 0x41542B4349504D55583D31
@@ -132,13 +133,12 @@ SMW2 	MOV R7, 0x4154
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL1		CBZ	R7,SMW3  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL1		CBZ	R7,SMW3  ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL1 ; Ciclo DL1 = Primer Delay de 1 tiempo
+		B	DL1      ; Ciclo DL1 = Primer Delay de 1 tiempo
 		
 		; Se establece una conexión TCP cliente al servidor del sistema, dando como párametros el IP del Server y el puerto de comunicación
 		; Se utiliza el comando AT+CIPSTART=4 = 0x41542b43495053544152543d34 
-		
 SMW3   	MOV R7, 0x4154
 		LDR R8,=TCPS1
 		STR R7,[R8]
@@ -193,12 +193,12 @@ SMW3   	MOV R7, 0x4154
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL12	CBZ	R7,SMW4  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL12	CBZ	R7,SMW4  ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL12 ; Ciclo DL12 = Segundo Delay de 1 tiempo
+		B	DL12     ; Ciclo DL12 = Segundo Delay de 1 tiempo
 		
-		;Establecer el comando AT para poder enviar datos através del módulo de wifi
-		;En este caso se utiliza el comando AT+CIPSEND=4 : 0x41542b43495053454e443d340a
+		; Establecer el comando AT para poder enviar datos através del módulo de wifi
+		; En este caso se utiliza el comando AT+CIPSEND=4 : 0x41542b43495053454e443d340a
 SMW4	MOV R7, 0x4154
 		LDR R8,=EDMW1
 		STR R7,[R8]
@@ -220,12 +220,12 @@ SMW4	MOV R7, 0x4154
 		MOV R7, 0x0A
 		LDR R8,=EDMW7
 		STR R7,[R8]
-		BX	LR
+		BX	LR  ; Se regresa al flujo principal del programa
 		
 ; Paso #1		
 ; Subrutina que se encarga de hacer el request GET de los datos de la cámara térmica y de la cámara de distancia
 		
-		;Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos de la cámara térmica
+		; Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos de la cámara térmica
 		; GET/CT.html HTTP/1.1 = 0x4745542f43542e68746d6c20485454502f312e31
 GDC		MOV R7, 0x4745
 		LDR R8,=URL1
@@ -264,28 +264,28 @@ GDC		MOV R7, 0x4745
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL13	CBZ	R7,GDC2  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL13	CBZ	R7,GDC2  ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL13 ; Ciclo DL13 = Tercer Delay de 1 tiempo
+		B	DL13     ; Ciclo DL13 = Tercer Delay de 1 tiempo
 		
 		
 		
 		; Ciclo que realiza el GET de los datos de la cámara térmica
-GDC2	MOV R6,#0 ; Se establece el contador en 0
-		LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
-		
-GDC3	CMP R6,#500 ; El valor real es 153600, para efectos de prueba se deja en 500
+GDC2	MOV R6,#0     ; Se establece el contador en 0
+		LDR R7,=G4BS  ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
+GDC3	CMP R6,#500   ; El valor real es 153600, para efectos de prueba se deja en 500
 		BEQ	GDC4
 		LDRNE CT,[R7] ; Se almacena el contenido de la dirección guardada en R7 en el registro de la cámara térmica
 		LDRNE R8,=DCT ; Se almacena en R8 la dirección de memoria donde se almacenan los datos de la cámara térmica
-		;Para guardar los datos de la cámara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
+		
+		; Para guardar los datos de la cámara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
 		STRNE CT,[R8,R6] ; Se guarda lo que hay en el registro de la cámara térmica en la dirección de memoria correspondiente
-		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
+		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
 		BNE GDC3
 	
 	
-		;Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos de la cámara de distancia
-		;GET/CD.html HTTP/1.1 = 0x4745542f43442e68746d6c20485454502f312e31
+		; Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos de la cámara de distancia
+		; GET/CD.html HTTP/1.1 = 0x4745542f43442e68746d6c20485454502f312e31
 GDC4	MOV R7, 0x4745
 		LDR R8,=URL1
 		STR R7,[R8]
@@ -322,37 +322,37 @@ GDC4	MOV R7, 0x4745
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL14	CBZ	R7,GDC5  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL14	CBZ	R7,GDC5  ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL14 ; Ciclo DL14 = Cuarto Delay de 1 tiempo
+		B	DL14     ; Ciclo DL14 = Cuarto Delay de 1 tiempo
 		
 		
-		;Ciclo que realiza el GET de los datos de la cámara de distancia
-		;Se almacena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema. Esto para revisar en memoria y simular el envío de datos distintos
+		; Ciclo que realiza el GET de los datos de la cámara de distancia
+		; Se almacena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema. Esto para revisar en memoria y simular el envío de datos distintos
 GDC5	MOV R7,0x0000DDDD
 		LDR R8,=G4BS
 		STR R7,[R8]
-		MOV R6,#0 ; Se establece el contador en 0
+		MOV R6,#0    ; Se establece el contador en 0
 		LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
-
-GDC6	CMP R6,#500 ; El valor real es 4147200, para efectos de prueba se deja en 500
+GDC6	CMP R6,#500  ; El valor real es 4147200, para efectos de prueba se deja en 500
 		BEQ	GDC7
-		LDRNE CD,[R7] ; Se almacena el contenido de la dirección guardada en R7 en el registro de la cámara de distancia
+		LDRNE CD,[R7]  ; Se almacena el contenido de la dirección guardada en R7 en el registro de la cámara de distancia
 		LDRNE R8,=DCDD ; Se almacena en R8 la dirección de memoria donde se almacenan los datos de la cámara de distancia
-		;Para guardar los datos de la cámara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
+		
+		; Para guardar los datos de la cámara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
 		STRNE CD,[R8,R6] ; Se guarda lo que hay en el registro de la cámara de distancia en la dirección de memoria correspondiente
-		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
+		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
 		BNE GDC6
 		
-GDC7	BX	LR
+GDC7	BX	LR  ; Se regresa al flujo principal del programa
 		
 
 
-;Paso #2
+; Paso #2
 ; Subrutina que se encarga de hacer el request POST de los datos obtenidos de las cámaras al Server del sistema
 
-		;Establecer la URL de Envío, que en este caso corresponde con la Operación POST, para mandar los datos de la cámara térmica
-		;POST/CT.html HTTP/1.1 = 0x504f53542f43542e68746d6c20485454502f312e31
+		; Establecer la URL de Envío, que en este caso corresponde con la Operación POST, para mandar los datos de la cámara térmica
+		; POST/CT.html HTTP/1.1 = 0x504f53542f43542e68746d6c20485454502f312e31
 PDS		MOV R7, 0x504F
 		LDR R8,=URL1
 		STR R7,[R8]
@@ -389,25 +389,23 @@ PDS		MOV R7, 0x504F
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL15	CBZ	R7,PDS2 ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL15	CBZ	R7,PDS2 ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL15 ; Ciclo DL15 = Quinto Delay de 1 tiempo
+		B	DL15    ; Ciclo DL15 = Quinto Delay de 1 tiempo
 		
-		;Ciclo que realiza el POST de los datos de la cámara térmica
-PDS2	MOV R6,#0 ; Se establece el contador en 0
+		; Ciclo que realiza el POST de los datos de la cámara térmica
+PDS2	MOV R6,#0    ; Se establece el contador en 0
 		LDR R7,=P4BS ; Se carga en R7 la dirección de memoria donde se guardan los datos que serán enviados mediante la instrucción POST
-		LDR R8,=DCT ; Se carga en R8 la dirección de memoria donde comienzan los datos de la cámara térmica
-		
-PDS3	CMP R6,#500 ; El valor real es 153600, para efectos de prueba se deja en 500
+		LDR R8,=DCT  ; Se carga en R8 la dirección de memoria donde comienzan los datos de la cámara térmica
+PDS3	CMP R6,#500  ; El valor real es 153600, para efectos de prueba se deja en 500
 		BEQ	PDS4
 		LDRNE CT,[R8,R6]
 		STRNE CT,[R7]
-		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
+		ADDNE R6,R6,#4  ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
 		BNE PDS3
 		
-		;Establecer la URL de Envío, que en este caso corresponde con la Operación POST, para mandar los datos de la cámara de distancia
-		;POST/CD.html HTTP/1.1 = 0x504f53542f43442e68746d6c20485454502f312e31
-		
+		; Establecer la URL de Envío, que en este caso corresponde con la Operación POST, para mandar los datos de la cámara de distancia
+		; POST/CD.html HTTP/1.1 = 0x504f53542f43442e68746d6c20485454502f312e31
 PDS4	MOV R7, 0x504F
 		LDR R8,=URL1
 		STR R7,[R8]
@@ -444,30 +442,29 @@ PDS4	MOV R7, 0x504F
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL16	CBZ	R7,PDS5 ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL16	CBZ	R7,PDS5 ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL16 ; Ciclo DL16 = Sexto Delay de 1 tiempo
+		B	DL16    ; Ciclo DL16 = Sexto Delay de 1 tiempo
 
 		
-		;Ciclo que realiza el POST de los datos de la cámara de distancia
-PDS5	MOV R6,#0 ; Se establece el contador en 0
+		; Ciclo que realiza el POST de los datos de la cámara de distancia
+PDS5	MOV R6,#0    ; Se establece el contador en 0
 		LDR R7,=P4BS ; Se carga en R7 la dirección de memoria donde se guardan los datos que serán enviados mediante la instrucción POST
 		LDR R8,=DCDD ; Se carga en R8 la dirección de memoria donde comienzan los datos de la cámara de distancia
-		
-PDS6	CMP R6,#500 ; El valor real es 4147200, para efectos de prueba se deja en 500
+PDS6	CMP R6,#500  ; El valor real es 4147200, para efectos de prueba se deja en 500
 		BEQ	PDS7
 		LDRNE CD,[R8,R6]
 		STRNE CD,[R7]
-		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
+		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
 		BNE PDS6
 		
-PDS7	BX	LR	
+PDS7	BX	LR	; Se regresa al flujo principal del programa
 
-;Paso #3
+; Paso #3
 ; Subrutina que se encarga de hacer el request GET al Server del Mensaje de que se proyectará en el LCD y del código de activación de las alarmas
 
-		;Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos del mensaje del server
-		;GET/MS.html HTTP/1.1 = 0x4745542f4d532e68746d6c20485454502f312e31
+		; Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos del mensaje del server
+		; GET/MS.html HTTP/1.1 = 0x4745542f4d532e68746d6c20485454502f312e31
 GMA		MOV R7, 0x4745
 		LDR R8,=URL1
 		STR R7,[R8]
@@ -502,32 +499,32 @@ GMA		MOV R7, 0x4745
 		LDR	R8,=URL11
 		STR	R7,[R8]
 		
-		;Se alamcena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
+		; Se alamcena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
 		MOV R7,0x0000AAAA
 		LDR R8,=G4BS
 		STR R7,[R8]
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL17	CBZ	R7,GMA2 ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL17	CBZ	R7,GMA2 ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL17 ; Ciclo DL17 = Séptimo Delay de 1 tiempo
+		B	DL17    ; Ciclo DL17 = Séptimo Delay de 1 tiempo
 		
 		; Ciclo que realiza el GET de los datos del mensaje del server
-GMA2	MOV R6,#0 ; Se establece el contador en 0
+GMA2	MOV R6,#0    ; Se establece el contador en 0
 		LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
-		
-GMA3	CMP R6,#44 ; Se deben llenar 11 bloques de memoria con 4 bytes cadda uno, para obtener el mensaje completo del server 
+GMA3	CMP R6,#44   ; Se deben llenar 11 bloques de memoria con 4 bytes cada uno, para obtener el mensaje completo del server 
 		BEQ	GMA4
 		LDRNE MS,[R7] ; Se almacena el contenido de la dirección guardada en R7 en el registro del mensaje del server
 		LDRNE R8,=DMS ; Se almacena en R8 la dirección de memoria donde se almacenan los datos del mensaje del server
-		;Para guardar el mensaje del server se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
+		
+		; Para guardar el mensaje del server se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
 		STRNE MS,[R8,R6] ; Se guarda lo que hay en el registro del mensaje del server en la dirección de memoria correspondiente
-		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
+		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
 		BNE GMA3
 		
-		;Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para el valor de alarmas enviado por el server
-		;GET/AS.html HTTP/1.1 = 0x4745542f41532e68746d6c20485454502f312e31
+		; Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para el valor de las alarmas enviado por el server
+		; GET/AS.html HTTP/1.1 = 0x4745542f41532e68746d6c20485454502f312e31
 GMA4	MOV R7, 0x4745
 		LDR R8,=URL1
 		STR R7,[R8]
@@ -562,29 +559,29 @@ GMA4	MOV R7, 0x4745
 		LDR	R8,=URL11
 		STR	R7,[R8]
 		
-		;Se alamcena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
+		; Se alamcena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
 		MOV R7,0x0000EAEA
 		LDR R8,=G4BS
 		STR R7,[R8]
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL18	CBZ	R7,GMA5 ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL18	CBZ	R7,GMA5 ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL18 ; Ciclo DL18 = Octavo Delay de 1 tiempo
+		B	DL18    ; Ciclo DL18 = Octavo Delay de 1 tiempo
 		
-		;Subrutina que se encarga de almacenar en memoria el valor obtenido al hacer el GET al Server del activador de las alarmas
+		; Subrutina que se encarga de almacenar en memoria el valor obtenido al hacer el GET al Server del activador de las alarmas
 GMA5	LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
 		LDR	R8,=DAS	 ; Se almacena en R8 la dirección de memoria donde se almacenan los datos del activador de las alarmas
 		LDR	AS,[R7]
 		STR	AS,[R8]
-		BX	LR
+		BX	LR ; Se regresa al flujo principal del programa
 		
 
 ; Paso #4
 ; Subrutina que se encarga de mandar al LCD el mensaje obtenido através del servidor y de activar o no las alarmas dependiendo de lo obtenido por el Server
 
-EMA 	BL  INF ; Se regresa al Branch INF para generar un loop infinito
+EMA 	BL  INF ; Se regresa al Branch INF para generar un loop infinito que pase realizando las peticiones GET,POST y activar o no las alarmas del sistema
 		
 		
 		END
