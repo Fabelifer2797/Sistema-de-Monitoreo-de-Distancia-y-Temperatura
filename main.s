@@ -54,10 +54,10 @@ URL8		EQU		0x20000098  ; Etiqueta del espacio de memoria para la URL de comunica
 URL9		EQU		0x2000009C  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 9
 URL10		EQU		0x200000A0  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 10
 URL11		EQU		0x200000A4  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 11
-G4BS		EQU		0x200000A8	; Etiqueta del espacio de memoria que represeta el GET de 4 Bytes que se obtienen a través de la comunicación serial
+G4BS		EQU		0x200000A8	; Etiqueta del espacio de memoria que representa el GET de 4 Bytes que se obtienen a través de la comunicación serial
 DCT			EQU		0x200000AC  ; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cámara térmica
 DCDD		EQU		0x200002A0	; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cámara de distancia
-
+P4BS		EQU		0x20000494	; Etiqueta del espacio de memoria que representa el POST de 4 Bytes que se mandan a través de la comunicación serial
 
 
 
@@ -92,6 +92,7 @@ SMW		MOV R6,#2
 		;Se establece el Baudrate de la comunicación serial 
 		MOV R6,#9600
 		LDR R7,=BRS ; Se inicializa la velocidad de comunicación serial en 9600
+		LTORG
 		STR R6,[R7]
 		
 		;Se alamcena un valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema
@@ -345,7 +346,117 @@ GDC9	BX	LR
 ;Paso #2
 ; Subrutina que se encarga de hacer el request POST de los datos obtenidos de las cámaras al Server del sistema
 
-PDS		MOV R6,1
+		;Establecer la URL de Envío, que en este caso corresponde con la Operación POST, para mandar los datos de la cámara térmica
+		;POST/CT.html HTTP/1.1 = 0x504f53542f43542e68746d6c20485454502f312e31
+PDS		MOV R7, 0x504F
+		LDR R8,=URL1
+		STR R7,[R8]
+		MOV R7, 0x5354
+		LDR R8,=URL2
+		STR R7,[R8]
+		MOV R7, 0x2F43
+		LDR R8,=URL3
+		STR R7,[R8]
+		MOV R7, 0x542E
+		LDR R8,=URL4
+		STR R7,[R8]
+		MOV R7, 0x6874
+		LDR R8,=URL5
+		STR R7,[R8]
+		MOV R7, 0x6D6C
+		LDR R8,=URL6
+		STR R7,[R8]
+		MOV R7, 0x2048
+		LDR R8,=URL7
+		STR R7,[R8]
+		MOV R7, 0x5454
+		LDR R8,=URL8
+		STR R7,[R8]
+		MOV R7, 0x502F
+		LDR R8,=URL9
+		STR R7,[R8]
+		MOV R7, 0x312E
+		LDR R8,=URL10
+		STR R7,[R8]
+		MOV R7,0x31
+		LDR	R8,=URL11
+		STR	R7,[R8]
+		
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		MOV R7,#1
+DL15	CBZ	R7,PDS2 ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+		SUB R7,R7,#1
+		B	DL15 ; Ciclo DL15 = Quinto Delay de 1 tiempo
+		
+		;Ciclo que realiza el POST de los datos de la cámara térmica
+PDS2	MOV R6,#0 ; Se establece el contador en 0
+		LDR R7,=P4BS ; Se carga en R7 la dirección de memoria donde se guardan los datos que serán enviados mediante la instrucción POST
+		LDR R8,=DCT ; Se carga en R8 la dirección de memoria donde comienzan los datos de la cámara térmica
+		
+PDS3	CMP R6,#500 ; El valor real es 153600, para efectos de prueba se deja en 500
+		BEQ	PDS4
+		LDRNE CT,[R8,R6]
+		STRNE CT,[R7]
+		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
+		BNE PDS3
+		
+		;Establecer la URL de Envío, que en este caso corresponde con la Operación POST, para mandar los datos de la cámara de distancia
+		;POST/CD.html HTTP/1.1 = 0x504f53542f43442e68746d6c20485454502f312e31
+		
+PDS4	MOV R7, 0x504F
+		LDR R8,=URL1
+		STR R7,[R8]
+		MOV R7, 0x5354
+		LDR R8,=URL2
+		STR R7,[R8]
+		MOV R7, 0x2F43
+		LDR R8,=URL3
+		STR R7,[R8]
+		MOV R7, 0x442E
+		LDR R8,=URL4
+		STR R7,[R8]
+		MOV R7, 0x6874
+		LDR R8,=URL5
+		STR R7,[R8]
+		MOV R7, 0x6D6C
+		LDR R8,=URL6
+		STR R7,[R8]
+		MOV R7, 0x2048
+		LDR R8,=URL7
+		STR R7,[R8]
+		MOV R7, 0x5454
+		LDR R8,=URL8
+		STR R7,[R8]
+		MOV R7, 0x502F
+		LDR R8,=URL9
+		STR R7,[R8]
+		MOV R7, 0x312E
+		LDR R8,=URL10
+		STR R7,[R8]
+		MOV R7, 0x31
+		LDR	R8,=URL11
+		STR	R7,[R8]
+		
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		MOV R7,#1
+DL16	CBZ	R7,PDS5 ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+		SUB R7,R7,#1
+		B	DL16 ; Ciclo DL16 = Sexto Delay de 1 tiempo
+
+		
+		;Ciclo que realiza el POST de los datos de la cámara de distancia
+PDS5	MOV R6,#0 ; Se establece el contador en 0
+		LDR R7,=P4BS ; Se carga en R7 la dirección de memoria donde se guardan los datos que serán enviados mediante la instrucción POST
+		LDR R8,=DCDD ; Se carga en R8 la dirección de memoria donde comienzan los datos de la cámara de distancia
+		
+PDS6	CMP R6,#500 ; El valor real es 4147200, para efectos de prueba se deja en 500
+		BEQ	PDS7
+		LDRNE CD,[R8,R6]
+		STRNE CD,[R7]
+		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
+		BNE PDS6
+		
+PDS7	BX	LR	
 
 ;Paso #3
 ; Subrutina que se encarga de hacer el request GET al Server del Mensaje de que se proyectará en el LCD y del código de activación de las alarmas
