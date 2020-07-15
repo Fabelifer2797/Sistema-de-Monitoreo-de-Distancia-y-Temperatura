@@ -6,6 +6,8 @@ FALSE		EQU		0
 ; Se renombran los registros que se van a utilizar como variables
 CT			RN		R0
 CD			RN		R1
+AS			RN		R2
+MS			RN		R3
 
 	
 ; Se asignan etiquetas para los espacios de memoria RAM donde se almacenaran los ouputs del sistema
@@ -58,8 +60,8 @@ G4BS		EQU		0x200000A8	; Etiqueta del espacio de memoria que representa el GET de
 DCT			EQU		0x200000AC  ; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cámara térmica
 DCDD		EQU		0x200002A0	; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cámara de distancia
 P4BS		EQU		0x20000494	; Etiqueta del espacio de memoria que representa el POST de 4 Bytes que se mandan a través de la comunicación serial
-
-
+DMS			EQU		0x20000498  ; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos del mensaje obtenido por el server
+DAS			EQU		0x200004C4	; Etiqueta del espacio de memoria donde se almacena el activador de las alarmas de acuerdo a lo que diga el Server 
 
 
 ;Código del programa principal
@@ -258,6 +260,9 @@ GDC3	MOV R7, 0x4154
 		MOV R7, 0x2E31
 		LDR R8,=URL10
 		STR R7,[R8]
+		MOV R7,#0
+		LDR	R8,=URL11
+		STR	R7,[R8]
 		
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
@@ -314,6 +319,9 @@ GDC6	MOV R7, 0x4745
 		MOV R7, 0x2E31
 		LDR R8,=URL10
 		STR R7,[R8]
+		MOV R7,#0
+		LDR	R8,=URL11
+		STR	R7,[R8]
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
@@ -461,13 +469,125 @@ PDS7	BX	LR
 ;Paso #3
 ; Subrutina que se encarga de hacer el request GET al Server del Mensaje de que se proyectará en el LCD y del código de activación de las alarmas
 
-GMA		MOV R7,1
-
+		;Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos del mensaje del server
+		;GET/MS.html HTTP/1.1 = 0x4745542f4d532e68746d6c20485454502f312e31
+GMA		MOV R7, 0x4745
+		LDR R8,=URL1
+		STR R7,[R8]
+		MOV R7, 0x542F
+		LDR R8,=URL2
+		STR R7,[R8]
+		MOV R7, 0x4D53
+		LDR R8,=URL3
+		STR R7,[R8]
+		MOV R7, 0x2E68
+		LDR R8,=URL4
+		STR R7,[R8]
+		MOV R7, 0x746D
+		LDR R8,=URL5
+		STR R7,[R8]
+		MOV R7, 0x6C20
+		LDR R8,=URL6
+		STR R7,[R8]
+		MOV R7, 0x4854
+		LDR R8,=URL7
+		STR R7,[R8]
+		MOV R7, 0x5450
+		LDR R8,=URL8
+		STR R7,[R8]
+		MOV R7, 0x2F31
+		LDR R8,=URL9
+		STR R7,[R8]
+		MOV R7, 0x2E31
+		LDR R8,=URL10
+		STR R7,[R8]
+		MOV R7,#0
+		LDR	R8,=URL11
+		STR	R7,[R8]
+		
+		;Se alamcena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
+		MOV R7,0x0000AAAA
+		LDR R8,=G4BS
+		STR R7,[R8]
+		
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		MOV R7,#1
+DL17	CBZ	R7,GMA2 ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+		SUB R7,R7,#1
+		B	DL17 ; Ciclo DL17 = Séptimo Delay de 1 tiempo
+		
+		; Ciclo que realiza el GET de los datos del mensaje del server
+GMA2	MOV R6,#0 ; Se establece el contador en 0
+		LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
+		
+GMA3	CMP R6,#44 ; Se deben llenar 11 bloques de memoria con 4 bytes cadda uno, para obtener el mensaje completo del server 
+		BEQ	GMA4
+		LDRNE MS,[R7] ; Se almacena el contenido de la dirección guardada en R7 en el registro del mensaje del server
+		LDRNE R8,=DMS ; Se almacena en R8 la dirección de memoria donde se almacenan los datos del mensaje del server
+		;Para guardar el mensaje del server se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
+		STRNE MS,[R8,R6] ; Se guarda lo que hay en el registro del mensaje del server en la dirección de memoria correspondiente
+		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
+		BNE GMA3
+		
+		;Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para el valor de alarmas enviado por el server
+		;GET/AS.html HTTP/1.1 = 0x4745542f41532e68746d6c20485454502f312e31
+GMA4	MOV R7, 0x4745
+		LDR R8,=URL1
+		STR R7,[R8]
+		MOV R7, 0x542F
+		LDR R8,=URL2
+		STR R7,[R8]
+		MOV R7, 0x4153
+		LDR R8,=URL3
+		STR R7,[R8]
+		MOV R7, 0x2E68
+		LDR R8,=URL4
+		STR R7,[R8]
+		MOV R7, 0x746D
+		LDR R8,=URL5
+		STR R7,[R8]
+		MOV R7, 0x6C20
+		LDR R8,=URL6
+		STR R7,[R8]
+		MOV R7, 0x4854
+		LDR R8,=URL7
+		STR R7,[R8]
+		MOV R7, 0x5450
+		LDR R8,=URL8
+		STR R7,[R8]
+		MOV R7, 0x2F31
+		LDR R8,=URL9
+		STR R7,[R8]
+		MOV R7, 0x2e31
+		LDR R8,=URL10
+		STR R7,[R8]
+		MOV R7,#0
+		LDR	R8,=URL11
+		STR	R7,[R8]
+		
+		;Se alamcena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
+		MOV R7,0x0000EAEA
+		LDR R8,=G4BS
+		STR R7,[R8]
+		
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		MOV R7,#1
+DL18	CBZ	R7,GMA5 ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+		SUB R7,R7,#1
+		B	DL18 ; Ciclo DL18 = Octavo Delay de 1 tiempo
+		
+		;Subrutina que se encarga de almacenar en memoria el valor obtenido al hacer el GET al Server del activador de las alarmas
+GMA5	LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
+		LDR	R8,=DAS	 ; Se almacena en R8 la dirección de memoria donde se almacenan los datos del activador de las alarmas
+		LDR	AS,[R7]
+		STR	AS,[R8]
+		BX	LR
+		
 
 ; Paso #4
 ; Subrutina que se encarga de mandar al LCD el mensaje obtenido através del servidor y de activar o no las alarmas dependiendo de lo obtenido por el Server
 
-EMA 	MOV R8,0
-		BL  INF ; Se regresa al Branch INF para generar un loop infinito
+EMA 	BL  INF ; Se regresa al Branch INF para generar un loop infinito
+		
 		
 		END

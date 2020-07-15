@@ -25,7 +25,7 @@
     <View>
       <WinId>204</WinId>
       <ViewName>Performance Analyzer</ViewName>
-      <TableColWidths>262 123 123 626</TableColWidths>
+      <TableColWidths>358 123 123 530</TableColWidths>
     </View>
   </SECTreeCtrl>
 
@@ -3606,9 +3606,9 @@
       <ActiveTab>0</ActiveTab>
       <Doc>
         <Name>.\main.s</Name>
-        <ColumnNumber>19</ColumnNumber>
-        <TopLine>82</TopLine>
-        <CurrentLine>96</CurrentLine>
+        <ColumnNumber>14</ColumnNumber>
+        <TopLine>566</TopLine>
+        <CurrentLine>584</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>
