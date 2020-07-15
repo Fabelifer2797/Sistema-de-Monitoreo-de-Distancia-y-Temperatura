@@ -107,17 +107,10 @@ SMW		MOV R6,#2
 DL2		CBZ	R6,SMW2  ;Básicamente lo saca del loop cuando R6(contador del delay en este caso) sea cero
 		SUB R6,R6,#1
 		B	DL2 ; Ciclo DL2 = Delay de 2 tiempos
-		
-SMW2	BX	LR
-		
-		
-		
-; Paso #1		
-; Subrutina que se encarga de hacer el request GET de los datos de la cámara térmica y de la cámara de distancia
-
+				
 		
 		; Establecer conexiones múltiples TCP en el módulo  Wifi, con el comando AT: AT+CIPMUX=1 = 0x41542B4349504D55583D31
-GDC 	MOV R7, 0x4154
+SMW2 	MOV R7, 0x4154
 		LDR R8,=EMC1
 		STR R7,[R8]
 		MOV R7,0x2B43
@@ -139,14 +132,14 @@ GDC 	MOV R7, 0x4154
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL1		CBZ	R7,GDC2  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL1		CBZ	R7,SMW3  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL1 ; Ciclo DL1 = Primer Delay de 1 tiempo
 		
 		; Se establece una conexión TCP cliente al servidor del sistema, dando como párametros el IP del Server y el puerto de comunicación
 		; Se utiliza el comando AT+CIPSTART=4 = 0x41542b43495053544152543d34 
 		
-GDC2   	MOV R7, 0x4154
+SMW3   	MOV R7, 0x4154
 		LDR R8,=TCPS1
 		STR R7,[R8]
 		MOV R7, 0x2B43
@@ -200,13 +193,13 @@ GDC2   	MOV R7, 0x4154
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL12	CBZ	R7,GDC3  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL12	CBZ	R7,SMW4  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL12 ; Ciclo DL12 = Segundo Delay de 1 tiempo
 		
 		;Establecer el comando AT para poder enviar datos através del módulo de wifi
 		;En este caso se utiliza el comando AT+CIPSEND=4 : 0x41542b43495053454e443d340a
-GDC3	MOV R7, 0x4154
+SMW4	MOV R7, 0x4154
 		LDR R8,=EDMW1
 		STR R7,[R8]
 		MOV R7, 0x2B43
@@ -227,10 +220,14 @@ GDC3	MOV R7, 0x4154
 		MOV R7, 0x0A
 		LDR R8,=EDMW7
 		STR R7,[R8]
+		BX	LR
+		
+; Paso #1		
+; Subrutina que se encarga de hacer el request GET de los datos de la cámara térmica y de la cámara de distancia
 		
 		;Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos de la cámara térmica
 		; GET/CT.html HTTP/1.1 = 0x4745542f43542e68746d6c20485454502f312e31
-		MOV R7, 0x4745
+GDC		MOV R7, 0x4745
 		LDR R8,=URL1
 		STR R7,[R8]
 		MOV R7, 0x542F
@@ -267,29 +264,29 @@ GDC3	MOV R7, 0x4154
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL13	CBZ	R7,GDC4  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL13	CBZ	R7,GDC2  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL13 ; Ciclo DL13 = Tercer Delay de 1 tiempo
 		
 		
 		
 		; Ciclo que realiza el GET de los datos de la cámara térmica
-GDC4	MOV R6,#0 ; Se establece el contador en 0
+GDC2	MOV R6,#0 ; Se establece el contador en 0
 		LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
 		
-GDC5	CMP R6,#500 ; El valor real es 153600, para efectos de prueba se deja en 500
-		BEQ	GDC6
+GDC3	CMP R6,#500 ; El valor real es 153600, para efectos de prueba se deja en 500
+		BEQ	GDC4
 		LDRNE CT,[R7] ; Se almacena el contenido de la dirección guardada en R7 en el registro de la cámara térmica
 		LDRNE R8,=DCT ; Se almacena en R8 la dirección de memoria donde se almacenan los datos de la cámara térmica
 		;Para guardar los datos de la cámara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
 		STRNE CT,[R8,R6] ; Se guarda lo que hay en el registro de la cámara térmica en la dirección de memoria correspondiente
 		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
-		BNE GDC5
+		BNE GDC3
 	
 	
 		;Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos de la cámara de distancia
 		;GET/CD.html HTTP/1.1 = 0x4745542f43442e68746d6c20485454502f312e31
-GDC6	MOV R7, 0x4745
+GDC4	MOV R7, 0x4745
 		LDR R8,=URL1
 		STR R7,[R8]
 		MOV R7, 0x542F
@@ -325,29 +322,29 @@ GDC6	MOV R7, 0x4745
 		
 		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
 		MOV R7,#1
-DL14	CBZ	R7,GDC7  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL14	CBZ	R7,GDC5  ;Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL14 ; Ciclo DL14 = Cuarto Delay de 1 tiempo
 		
 		
 		;Ciclo que realiza el GET de los datos de la cámara de distancia
 		;Se almacena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema. Esto para revisar en memoria y simular el envío de datos distintos
-GDC7	MOV R7,0x0000DDDD
+GDC5	MOV R7,0x0000DDDD
 		LDR R8,=G4BS
 		STR R7,[R8]
 		MOV R6,#0 ; Se establece el contador en 0
 		LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
 
-GDC8	CMP R6,#500 ; El valor real es 4147200, para efectos de prueba se deja en 500
-		BEQ	GDC9
+GDC6	CMP R6,#500 ; El valor real es 4147200, para efectos de prueba se deja en 500
+		BEQ	GDC7
 		LDRNE CD,[R7] ; Se almacena el contenido de la dirección guardada en R7 en el registro de la cámara de distancia
 		LDRNE R8,=DCDD ; Se almacena en R8 la dirección de memoria donde se almacenan los datos de la cámara de distancia
 		;Para guardar los datos de la cámara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
 		STRNE CD,[R8,R6] ; Se guarda lo que hay en el registro de la cámara de distancia en la dirección de memoria correspondiente
 		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es tamaño de los bloques de memoria (4 bytes)
-		BNE GDC8
+		BNE GDC6
 		
-GDC9	BX	LR
+GDC7	BX	LR
 		
 
 

@@ -361,7 +361,7 @@ ARM Macro Assembler    Page 6
    77 00000000 F000 F808       BL               SMW         ; Branch de la subr
                                                             utina SMW = Setup d
                                                             el Módulo de Wifi
-   78 00000004 F000 F828 
+   78 00000004 F000 F8DC 
                        INF     BL               GDC         ; Branch de la subr
                                                             utina GDC = Get de 
                                                             los Datos de las Cá
@@ -432,828 +432,823 @@ ARM Macro Assembler    Page 7
   109 00000054 E7FB            B                DL2         ; Ciclo DL2 = Delay
                                                              de 2 tiempos
   110 00000056         
-  111 00000056 4770    SMW2    BX               LR
-  112 00000058         
-  113 00000058         
-  114 00000058         
-  115 00000058         ; Paso #1  
-  116 00000058         ; Subrutina que se encarga de hacer el request GET de lo
-                       s datos de la cámara térmica y de la cámara de distancia
-                       
-  117 00000058         
-  118 00000058         
-  119 00000058         ; Establecer conexiones múltiples TCP en el módulo  Wifi
+  111 00000056         
+  112 00000056         ; Establecer conexiones múltiples TCP en el módulo  Wifi
                        , con el comando AT: AT+CIPMUX=1 = 0x41542B4349504D55583
                        D31
-  120 00000058 F244 1754 
-                       GDC     MOV              R7, 0x4154
-  121 0000005C F8DF 8588       LDR              R8,=EMC1
-  122 00000060 F8C8 7000       STR              R7,[R8]
-  123 00000064 F642 3743       MOV              R7,0x2B43
-  124 00000068 F8DF 8580       LDR              R8,=EMC2
-  125 0000006C F8C8 7000       STR              R7,[R8]
-  126 00000070 F644 1750       MOV              R7,0x4950
+  113 00000056 F244 1754 
+                       SMW2    MOV              R7, 0x4154
+  114 0000005A F8DF 858C       LDR              R8,=EMC1
+  115 0000005E F8C8 7000       STR              R7,[R8]
+  116 00000062 F642 3743       MOV              R7,0x2B43
+  117 00000066 F8DF 8584       LDR              R8,=EMC2
+  118 0000006A F8C8 7000       STR              R7,[R8]
+  119 0000006E F644 1750       MOV              R7,0x4950
+  120 00000072 F8DF 857C       LDR              R8,=EMC3
+  121 00000076 F8C8 7000       STR              R7,[R8]
+  122 0000007A F644 5755       MOV              R7,0x4D55
+  123 0000007E F8DF 8574       LDR              R8,=EMC4
+  124 00000082 F8C8 7000       STR              R7,[R8]
+  125 00000086 F645 073D       MOV              R7,0x583D
+  126 0000008A F8DF 856C       LDR              R8,=EMC5
+  127 0000008E F8C8 7000       STR              R7,[R8]
+  128 00000092 F04F 0731       MOV              R7,0x31
 
 
 
 ARM Macro Assembler    Page 8 
 
 
-  127 00000074 F8DF 8578       LDR              R8,=EMC3
-  128 00000078 F8C8 7000       STR              R7,[R8]
-  129 0000007C F644 5755       MOV              R7,0x4D55
-  130 00000080 F8DF 8570       LDR              R8,=EMC4
-  131 00000084 F8C8 7000       STR              R7,[R8]
-  132 00000088 F645 073D       MOV              R7,0x583D
-  133 0000008C F8DF 8568       LDR              R8,=EMC5
-  134 00000090 F8C8 7000       STR              R7,[R8]
-  135 00000094 F04F 0731       MOV              R7,0x31
-  136 00000098 F8DF 8560       LDR              R8,=EMC6
-  137 0000009C F8C8 7000       STR              R7,[R8]
-  138 000000A0         
-  139 000000A0         
-  140 000000A0         ; Se hace un delay de 1 milisegundo (En este caso se esp
+  129 00000096 F8DF 8564       LDR              R8,=EMC6
+  130 0000009A F8C8 7000       STR              R7,[R8]
+  131 0000009E         
+  132 0000009E         
+  133 0000009E         ; Se hace un delay de 1 milisegundo (En este caso se esp
                        era 1 tiempo simbólico)
-  141 000000A0 F04F 0701       MOV              R7,#1
-  142 000000A4 B117    DL1     CBZ              R7,GDC2     ;Básicamente lo sac
+  134 0000009E F04F 0701       MOV              R7,#1
+  135 000000A2 B117    DL1     CBZ              R7,SMW3     ;Básicamente lo sac
                                                             a del loop cuando R
                                                             7(contador del dela
                                                             y en este caso) sea
                                                              cero
-  143 000000A6 F1A7 0701       SUB              R7,R7,#1
-  144 000000AA E7FB            B                DL1         ; Ciclo DL1 = Prime
+  136 000000A4 F1A7 0701       SUB              R7,R7,#1
+  137 000000A8 E7FB            B                DL1         ; Ciclo DL1 = Prime
                                                             r Delay de 1 tiempo
                                                             
-  145 000000AC         
-  146 000000AC         ; Se establece una conexión TCP cliente al servidor del 
+  138 000000AA         
+  139 000000AA         ; Se establece una conexión TCP cliente al servidor del 
                        sistema, dando como párametros el IP del Server y el pue
                        rto de comunicación
-  147 000000AC         ; Se utiliza el comando AT+CIPSTART=4 = 0x41542b43495053
+  140 000000AA         ; Se utiliza el comando AT+CIPSTART=4 = 0x41542b43495053
                        544152543d34 
-  148 000000AC         
-  149 000000AC F244 1754 
-                       GDC2    MOV              R7, 0x4154
-  150 000000B0 F8DF 854C       LDR              R8,=TCPS1
-  151 000000B4 F8C8 7000       STR              R7,[R8]
-  152 000000B8 F642 3743       MOV              R7, 0x2B43
-  153 000000BC F8DF 8544       LDR              R8,=TCPS2
-  154 000000C0 F8C8 7000       STR              R7,[R8]
-  155 000000C4 F644 1750       MOV              R7, 0x4950
-  156 000000C8 F8DF 853C       LDR              R8,=TCPS3
-  157 000000CC F8C8 7000       STR              R7,[R8]
-  158 000000D0 F245 3754       MOV              R7, 0x5354
-  159 000000D4 F8DF 8534       LDR              R8,=TCPS4
-  160 000000D8 F8C8 7000       STR              R7,[R8]
-  161 000000DC F244 1752       MOV              R7, 0x4152
-  162 000000E0 F8DF 852C       LDR              R8,=TCPS5
-  163 000000E4 F8C8 7000       STR              R7,[R8]
-  164 000000E8 F245 473D       MOV              R7, 0x543D
-  165 000000EC F8DF 8524       LDR              R8,=TCPS6
-  166 000000F0 F8C8 7000       STR              R7,[R8]
-  167 000000F4 F04F 0734       MOV              R7, 0x34
-  168 000000F8 F8DF 851C       LDR              R8,=TCPS7
-  169 000000FC F8C8 7000       STR              R7,[R8]
-  170 00000100         
-  171 00000100         ; Se establece el valor de TCP en 1 para indicar el tipo
+  141 000000AA         
+  142 000000AA F244 1754 
+                       SMW3    MOV              R7, 0x4154
+  143 000000AE F8DF 8550       LDR              R8,=TCPS1
+  144 000000B2 F8C8 7000       STR              R7,[R8]
+  145 000000B6 F642 3743       MOV              R7, 0x2B43
+  146 000000BA F8DF 8548       LDR              R8,=TCPS2
+  147 000000BE F8C8 7000       STR              R7,[R8]
+  148 000000C2 F644 1750       MOV              R7, 0x4950
+  149 000000C6 F8DF 8540       LDR              R8,=TCPS3
+  150 000000CA F8C8 7000       STR              R7,[R8]
+  151 000000CE F245 3754       MOV              R7, 0x5354
+  152 000000D2 F8DF 8538       LDR              R8,=TCPS4
+  153 000000D6 F8C8 7000       STR              R7,[R8]
+  154 000000DA F244 1752       MOV              R7, 0x4152
+  155 000000DE F8DF 8530       LDR              R8,=TCPS5
+  156 000000E2 F8C8 7000       STR              R7,[R8]
+  157 000000E6 F245 473D       MOV              R7, 0x543D
+  158 000000EA F8DF 8528       LDR              R8,=TCPS6
+  159 000000EE F8C8 7000       STR              R7,[R8]
+  160 000000F2 F04F 0734       MOV              R7, 0x34
+  161 000000F6 F8DF 8520       LDR              R8,=TCPS7
+  162 000000FA F8C8 7000       STR              R7,[R8]
+  163 000000FE         
+  164 000000FE         ; Se establece el valor de TCP en 1 para indicar el tipo
                         de conexión
-  172 00000100 F04F 0701       MOV              R7, #1
-  173 00000104 F8DF 8514       LDR              R8,=TCP
+  165 000000FE F04F 0701       MOV              R7, #1
+  166 00000102 F8DF 8518       LDR              R8,=TCP
+  167 00000106 F8C8 7000       STR              R7,[R8]
+  168 0000010A         
+  169 0000010A         ; Se establece el valor de la IP:192.168.1.19 = 0x313932
+                       2e3136382e312e310a
+  170 0000010A F243 1739       MOV              R7, 0x3139
+  171 0000010E F8DF 8510       LDR              R8,=IPS1
+  172 00000112 F8C8 7000       STR              R7,[R8]
+  173 00000116 F243 272E       MOV              R7, 0x322E
+  174 0000011A F8DF 8508       LDR              R8,=IPS2
 
 
 
 ARM Macro Assembler    Page 9 
 
 
-  174 00000108 F8C8 7000       STR              R7,[R8]
-  175 0000010C         
-  176 0000010C         ; Se establece el valor de la IP:192.168.1.19 = 0x313932
-                       2e3136382e312e310a
-  177 0000010C F243 1739       MOV              R7, 0x3139
-  178 00000110 F8DF 850C       LDR              R8,=IPS1
-  179 00000114 F8C8 7000       STR              R7,[R8]
-  180 00000118 F243 272E       MOV              R7, 0x322E
-  181 0000011C F8DF 8504       LDR              R8,=IPS2
-  182 00000120 F8C8 7000       STR              R7,[R8]
-  183 00000124 F243 1736       MOV              R7, 0x3136
-  184 00000128 F8DF 84FC       LDR              R8,=IPS3
-  185 0000012C F8C8 7000       STR              R7,[R8]
-  186 00000130 F643 072E       MOV              R7, 0x382E
-  187 00000134 F8DF 84F4       LDR              R8,=IPS4
-  188 00000138 F8C8 7000       STR              R7,[R8]
-  189 0000013C F243 172E       MOV              R7, 0x312E
-  190 00000140 F8DF 84EC       LDR              R8,=IPS5
-  191 00000144 F8C8 7000       STR              R7,[R8]
-  192 00000148 F243 170A       MOV              R7, 0x310A
-  193 0000014C F8DF 84E4       LDR              R8,=IPS6
-  194 00000150 F8C8 7000       STR              R7,[R8]
-  195 00000154         
-  196 00000154         ; Se define el puerto de comunicación EN 8080
-  197 00000154 F641 7790       MOV              R7, #8080
-  198 00000158 F8DF 84DC       LDR              R8,=PTCP
-  199 0000015C F8C8 7000       STR              R7,[R8]
-  200 00000160         
-  201 00000160         ; Se hace un delay de 1 milisegundo (En este caso se esp
+  175 0000011E F8C8 7000       STR              R7,[R8]
+  176 00000122 F243 1736       MOV              R7, 0x3136
+  177 00000126 F8DF 8500       LDR              R8,=IPS3
+  178 0000012A F8C8 7000       STR              R7,[R8]
+  179 0000012E F643 072E       MOV              R7, 0x382E
+  180 00000132 F8DF 84F8       LDR              R8,=IPS4
+  181 00000136 F8C8 7000       STR              R7,[R8]
+  182 0000013A F243 172E       MOV              R7, 0x312E
+  183 0000013E F8DF 84F0       LDR              R8,=IPS5
+  184 00000142 F8C8 7000       STR              R7,[R8]
+  185 00000146 F243 170A       MOV              R7, 0x310A
+  186 0000014A F8DF 84E8       LDR              R8,=IPS6
+  187 0000014E F8C8 7000       STR              R7,[R8]
+  188 00000152         
+  189 00000152         ; Se define el puerto de comunicación EN 8080
+  190 00000152 F641 7790       MOV              R7, #8080
+  191 00000156 F8DF 84E0       LDR              R8,=PTCP
+  192 0000015A F8C8 7000       STR              R7,[R8]
+  193 0000015E         
+  194 0000015E         ; Se hace un delay de 1 milisegundo (En este caso se esp
                        era 1 tiempo simbólico)
-  202 00000160 F04F 0701       MOV              R7,#1
-  203 00000164 B117    DL12    CBZ              R7,GDC3     ;Básicamente lo sac
+  195 0000015E F04F 0701       MOV              R7,#1
+  196 00000162 B117    DL12    CBZ              R7,SMW4     ;Básicamente lo sac
                                                             a del loop cuando R
                                                             7(contador del dela
                                                             y en este caso) sea
                                                              cero
-  204 00000166 F1A7 0701       SUB              R7,R7,#1
-  205 0000016A E7FB            B                DL12        ; Ciclo DL12 = Segu
+  197 00000164 F1A7 0701       SUB              R7,R7,#1
+  198 00000168 E7FB            B                DL12        ; Ciclo DL12 = Segu
                                                             ndo Delay de 1 tiem
                                                             po
-  206 0000016C         
-  207 0000016C         ;Establecer el comando AT para poder enviar datos atravé
+  199 0000016A         
+  200 0000016A         ;Establecer el comando AT para poder enviar datos atravé
                        s del módulo de wifi
-  208 0000016C         ;En este caso se utiliza el comando AT+CIPSEND=4 : 0x415
+  201 0000016A         ;En este caso se utiliza el comando AT+CIPSEND=4 : 0x415
                        42b43495053454e443d340a
-  209 0000016C F244 1754 
-                       GDC3    MOV              R7, 0x4154
-  210 00000170 F8DF 84C8       LDR              R8,=EDMW1
-  211 00000174 F8C8 7000       STR              R7,[R8]
-  212 00000178 F642 3743       MOV              R7, 0x2B43
-  213 0000017C F8DF 84C0       LDR              R8,=EDMW2
-  214 00000180 F8C8 7000       STR              R7,[R8]
-  215 00000184 F644 1750       MOV              R7, 0x4950
-  216 00000188 F8DF 84B8       LDR              R8,=EDMW3
-  217 0000018C F8C8 7000       STR              R7,[R8]
-  218 00000190 F245 3745       MOV              R7, 0x5345
-  219 00000194 F8DF 84B0       LDR              R8,=EDMW4
-  220 00000198 F8C8 7000       STR              R7,[R8]
-  221 0000019C F644 6744       MOV              R7, 0x4E44
+  202 0000016A F244 1754 
+                       SMW4    MOV              R7, 0x4154
+  203 0000016E F8DF 84CC       LDR              R8,=EDMW1
+  204 00000172 F8C8 7000       STR              R7,[R8]
+  205 00000176 F642 3743       MOV              R7, 0x2B43
+  206 0000017A F8DF 84C4       LDR              R8,=EDMW2
+  207 0000017E F8C8 7000       STR              R7,[R8]
+  208 00000182 F644 1750       MOV              R7, 0x4950
+  209 00000186 F8DF 84BC       LDR              R8,=EDMW3
+  210 0000018A F8C8 7000       STR              R7,[R8]
+  211 0000018E F245 3745       MOV              R7, 0x5345
+  212 00000192 F8DF 84B4       LDR              R8,=EDMW4
+  213 00000196 F8C8 7000       STR              R7,[R8]
+  214 0000019A F644 6744       MOV              R7, 0x4E44
+  215 0000019E F8DF 84AC       LDR              R8,=EDMW5
+  216 000001A2 F8C8 7000       STR              R7,[R8]
+  217 000001A6 F643 5734       MOV              R7, 0x3D34
+  218 000001AA F8DF 84A4       LDR              R8,=EDMW6
+  219 000001AE F8C8 7000       STR              R7,[R8]
+  220 000001B2 F04F 070A       MOV              R7, 0x0A
+  221 000001B6 F8DF 849C       LDR              R8,=EDMW7
+  222 000001BA F8C8 7000       STR              R7,[R8]
+  223 000001BE 4770            BX               LR
 
 
 
 ARM Macro Assembler    Page 10 
 
 
-  222 000001A0 F8DF 84A8       LDR              R8,=EDMW5
-  223 000001A4 F8C8 7000       STR              R7,[R8]
-  224 000001A8 F643 5734       MOV              R7, 0x3D34
-  225 000001AC F8DF 84A0       LDR              R8,=EDMW6
-  226 000001B0 F8C8 7000       STR              R7,[R8]
-  227 000001B4 F04F 070A       MOV              R7, 0x0A
-  228 000001B8 F8DF 8498       LDR              R8,=EDMW7
-  229 000001BC F8C8 7000       STR              R7,[R8]
-  230 000001C0         
-  231 000001C0         ;Establecer la URL de Envío, que en este caso correspond
+  224 000001C0         
+  225 000001C0         ; Paso #1  
+  226 000001C0         ; Subrutina que se encarga de hacer el request GET de lo
+                       s datos de la cámara térmica y de la cámara de distancia
+                       
+  227 000001C0         
+  228 000001C0         ;Establecer la URL de Envío, que en este caso correspond
                        e con la Operación GET, para obtener los datos de la cám
                        ara térmica
-  232 000001C0         ; GET/CT.html HTTP/1.1 = 0x4745542f43542e68746d6c2048545
+  229 000001C0         ; GET/CT.html HTTP/1.1 = 0x4745542f43542e68746d6c2048545
                        4502f312e31
-  233 000001C0 F244 7745       MOV              R7, 0x4745
-  234 000001C4 F8DF 8490       LDR              R8,=URL1
-  235 000001C8 F8C8 7000       STR              R7,[R8]
-  236 000001CC F245 472F       MOV              R7, 0x542F
-  237 000001D0 F8DF 8488       LDR              R8,=URL2
-  238 000001D4 F8C8 7000       STR              R7,[R8]
-  239 000001D8 F244 3754       MOV              R7, 0x4354
-  240 000001DC F8DF 8480       LDR              R8,=URL3
-  241 000001E0 F8C8 7000       STR              R7,[R8]
-  242 000001E4 F642 6768       MOV              R7, 0x2E68
-  243 000001E8 F8DF 8478       LDR              R8,=URL4
-  244 000001EC F8C8 7000       STR              R7,[R8]
-  245 000001F0 F247 476D       MOV              R7, 0x746D
-  246 000001F4 F8DF 8470       LDR              R8,=URL5
-  247 000001F8 F8C8 7000       STR              R7,[R8]
-  248 000001FC F646 4720       MOV              R7, 0x6C20
-  249 00000200 F8DF 8468       LDR              R8,=URL6
-  250 00000204 F8C8 7000       STR              R7,[R8]
-  251 00000208 F644 0754       MOV              R7, 0x4854
-  252 0000020C F8DF 8460       LDR              R8,=URL7
-  253 00000210 F8C8 7000       STR              R7,[R8]
-  254 00000214 F245 4750       MOV              R7, 0x5450
-  255 00000218 F8DF 8458       LDR              R8,=URL8
-  256 0000021C F8C8 7000       STR              R7,[R8]
-  257 00000220 F642 7731       MOV              R7, 0x2F31
-  258 00000224 F8DF 8450       LDR              R8,=URL9
-  259 00000228 F8C8 7000       STR              R7,[R8]
-  260 0000022C F642 6731       MOV              R7, 0x2E31
-  261 00000230 F8DF 8448       LDR              R8,=URL10
-  262 00000234 F8C8 7000       STR              R7,[R8]
-  263 00000238 F04F 0700       MOV              R7,#0
-  264 0000023C F8DF 8440       LDR              R8,=URL11
-  265 00000240 F8C8 7000       STR              R7,[R8]
-  266 00000244         
-  267 00000244         
-  268 00000244         ; Se hace un delay de 1 milisegundo (En este caso se esp
+  230 000001C0 F244 7745 
+                       GDC     MOV              R7, 0x4745
+  231 000001C4 F8DF 8490       LDR              R8,=URL1
+  232 000001C8 F8C8 7000       STR              R7,[R8]
+  233 000001CC F245 472F       MOV              R7, 0x542F
+  234 000001D0 F8DF 8488       LDR              R8,=URL2
+  235 000001D4 F8C8 7000       STR              R7,[R8]
+  236 000001D8 F244 3754       MOV              R7, 0x4354
+  237 000001DC F8DF 8480       LDR              R8,=URL3
+  238 000001E0 F8C8 7000       STR              R7,[R8]
+  239 000001E4 F642 6768       MOV              R7, 0x2E68
+  240 000001E8 F8DF 8478       LDR              R8,=URL4
+  241 000001EC F8C8 7000       STR              R7,[R8]
+  242 000001F0 F247 476D       MOV              R7, 0x746D
+  243 000001F4 F8DF 8470       LDR              R8,=URL5
+  244 000001F8 F8C8 7000       STR              R7,[R8]
+  245 000001FC F646 4720       MOV              R7, 0x6C20
+  246 00000200 F8DF 8468       LDR              R8,=URL6
+  247 00000204 F8C8 7000       STR              R7,[R8]
+  248 00000208 F644 0754       MOV              R7, 0x4854
+  249 0000020C F8DF 8460       LDR              R8,=URL7
+  250 00000210 F8C8 7000       STR              R7,[R8]
+  251 00000214 F245 4750       MOV              R7, 0x5450
+  252 00000218 F8DF 8458       LDR              R8,=URL8
+  253 0000021C F8C8 7000       STR              R7,[R8]
+  254 00000220 F642 7731       MOV              R7, 0x2F31
+  255 00000224 F8DF 8450       LDR              R8,=URL9
+  256 00000228 F8C8 7000       STR              R7,[R8]
+  257 0000022C F642 6731       MOV              R7, 0x2E31
+  258 00000230 F8DF 8448       LDR              R8,=URL10
+  259 00000234 F8C8 7000       STR              R7,[R8]
+  260 00000238 F04F 0700       MOV              R7,#0
+  261 0000023C F8DF 8440       LDR              R8,=URL11
+  262 00000240 F8C8 7000       STR              R7,[R8]
+  263 00000244         
+  264 00000244         
+  265 00000244         ; Se hace un delay de 1 milisegundo (En este caso se esp
                        era 1 tiempo simbólico)
-  269 00000244 F04F 0701       MOV              R7,#1
-  270 00000248 B117    DL13    CBZ              R7,GDC4     ;Básicamente lo sac
+  266 00000244 F04F 0701       MOV              R7,#1
+  267 00000248 B117    DL13    CBZ              R7,GDC2     ;Básicamente lo sac
                                                             a del loop cuando R
                                                             7(contador del dela
                                                             y en este caso) sea
                                                              cero
-  271 0000024A F1A7 0701       SUB              R7,R7,#1
-  272 0000024E E7FB            B                DL13        ; Ciclo DL13 = Terc
+  268 0000024A F1A7 0701       SUB              R7,R7,#1
+  269 0000024E E7FB            B                DL13        ; Ciclo DL13 = Terc
+                                                            er Delay de 1 tiemp
+                                                            o
 
 
 
 ARM Macro Assembler    Page 11 
 
 
-                                                            er Delay de 1 tiemp
-                                                            o
-  273 00000250         
-  274 00000250         
-  275 00000250         
-  276 00000250         ; Ciclo que realiza el GET de los datos de la cámara tér
+  270 00000250         
+  271 00000250         
+  272 00000250         
+  273 00000250         ; Ciclo que realiza el GET de los datos de la cámara tér
                        mica
-  277 00000250 F04F 0600 
-                       GDC4    MOV              R6,#0       ; Se establece el c
+  274 00000250 F04F 0600 
+                       GDC2    MOV              R6,#0       ; Se establece el c
                                                             ontador en 0
-  278 00000254 4FE3            LDR              R7,=G4BS    ; Se carga en R7 la
+  275 00000254 4FE3            LDR              R7,=G4BS    ; Se carga en R7 la
                                                              dirección de memor
                                                             ia donde se obtiene
                                                             n los datos del GET
                                                             
-  279 00000256         
-  280 00000256 F5B6 7FFA 
-                       GDC5    CMP              R6,#500     ; El valor real es 
+  276 00000256         
+  277 00000256 F5B6 7FFA 
+                       GDC3    CMP              R6,#500     ; El valor real es 
                                                             153600, para efecto
                                                             s de prueba se deja
                                                              en 500
-  281 0000025A D007            BEQ              GDC6
-  282 0000025C BF1F 6838       LDRNE            CT,[R7]     ; Se almacena el co
+  278 0000025A D007            BEQ              GDC4
+  279 0000025C BF1F 6838       LDRNE            CT,[R7]     ; Se almacena el co
                                                             ntenido de la direc
                                                             ción guardada en R7
                                                              en el registro de 
                                                             la cámara térmica
-  283 00000260 F8DF 8420       LDRNE            R8,=DCT     ; Se almacena en R8
+  280 00000260 F8DF 8420       LDRNE            R8,=DCT     ; Se almacena en R8
                                                              la dirección de me
                                                             moria donde se alma
                                                             cenan los datos de 
                                                             la cámara térmica
-  284 00000264         ;Para guardar los datos de la cámara se usa como base el
+  281 00000264         ;Para guardar los datos de la cámara se usa como base el
                         valor inicial de R8 y se le suma el offset correspondie
                        nte al valor actual del contador
-  285 00000264 F848 0006       STRNE            CT,[R8,R6]  ; Se guarda lo que 
+  282 00000264 F848 0006       STRNE            CT,[R8,R6]  ; Se guarda lo que 
                                                             hay en el registro 
                                                             de la cámara térmic
                                                             a en la dirección d
                                                             e memoria correspon
                                                             diente
-  286 00000268 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
+  283 00000268 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
                                                             contador en 4, que 
                                                             es tamaño de los bl
                                                             oques de memoria (4
                                                              bytes)
-  287 0000026A D1F4            BNE              GDC5
-  288 0000026C         
-  289 0000026C         
-  290 0000026C         ;Establecer la URL de Envío, que en este caso correspond
+  284 0000026A D1F4            BNE              GDC3
+  285 0000026C         
+  286 0000026C         
+  287 0000026C         ;Establecer la URL de Envío, que en este caso correspond
                        e con la Operación GET, para obtener los datos de la cám
                        ara de distancia
-  291 0000026C         ;GET/CD.html HTTP/1.1 = 0x4745542f43442e68746d6c20485454
+  288 0000026C         ;GET/CD.html HTTP/1.1 = 0x4745542f43442e68746d6c20485454
                        502f312e31
-  292 0000026C F244 7745 
-                       GDC6    MOV              R7, 0x4745
-  293 00000270 F8DF 83E4       LDR              R8,=URL1
-  294 00000274 F8C8 7000       STR              R7,[R8]
-  295 00000278 F245 472F       MOV              R7, 0x542F
+  289 0000026C F244 7745 
+                       GDC4    MOV              R7, 0x4745
+  290 00000270 F8DF 83E4       LDR              R8,=URL1
+  291 00000274 F8C8 7000       STR              R7,[R8]
+  292 00000278 F245 472F       MOV              R7, 0x542F
+  293 0000027C F8DF 83DC       LDR              R8,=URL2
+  294 00000280 F8C8 7000       STR              R7,[R8]
 
 
 
 ARM Macro Assembler    Page 12 
 
 
-  296 0000027C F8DF 83DC       LDR              R8,=URL2
-  297 00000280 F8C8 7000       STR              R7,[R8]
-  298 00000284 F244 3744       MOV              R7, 0x4344
-  299 00000288 F8DF 83D4       LDR              R8,=URL3
-  300 0000028C F8C8 7000       STR              R7,[R8]
-  301 00000290 F642 6768       MOV              R7, 0x2E68
-  302 00000294 F8DF 83CC       LDR              R8,=URL4
-  303 00000298 F8C8 7000       STR              R7,[R8]
-  304 0000029C F247 476D       MOV              R7, 0x746D
-  305 000002A0 F8DF 83C4       LDR              R8,=URL5
-  306 000002A4 F8C8 7000       STR              R7,[R8]
-  307 000002A8 F646 4720       MOV              R7, 0x6C20
-  308 000002AC F8DF 83BC       LDR              R8,=URL6
-  309 000002B0 F8C8 7000       STR              R7,[R8]
-  310 000002B4 F644 0754       MOV              R7, 0x4854
-  311 000002B8 F8DF 83B4       LDR              R8,=URL7
-  312 000002BC F8C8 7000       STR              R7,[R8]
-  313 000002C0 F245 4750       MOV              R7, 0x5450
-  314 000002C4 F8DF 83AC       LDR              R8,=URL8
-  315 000002C8 F8C8 7000       STR              R7,[R8]
-  316 000002CC F642 7731       MOV              R7, 0x2F31
-  317 000002D0 F8DF 83A4       LDR              R8,=URL9
-  318 000002D4 F8C8 7000       STR              R7,[R8]
-  319 000002D8 F642 6731       MOV              R7, 0x2E31
-  320 000002DC F8DF 839C       LDR              R8,=URL10
-  321 000002E0 F8C8 7000       STR              R7,[R8]
-  322 000002E4 F04F 0700       MOV              R7,#0
-  323 000002E8 F8DF 8394       LDR              R8,=URL11
-  324 000002EC F8C8 7000       STR              R7,[R8]
-  325 000002F0         
-  326 000002F0         ; Se hace un delay de 1 milisegundo (En este caso se esp
+  295 00000284 F244 3744       MOV              R7, 0x4344
+  296 00000288 F8DF 83D4       LDR              R8,=URL3
+  297 0000028C F8C8 7000       STR              R7,[R8]
+  298 00000290 F642 6768       MOV              R7, 0x2E68
+  299 00000294 F8DF 83CC       LDR              R8,=URL4
+  300 00000298 F8C8 7000       STR              R7,[R8]
+  301 0000029C F247 476D       MOV              R7, 0x746D
+  302 000002A0 F8DF 83C4       LDR              R8,=URL5
+  303 000002A4 F8C8 7000       STR              R7,[R8]
+  304 000002A8 F646 4720       MOV              R7, 0x6C20
+  305 000002AC F8DF 83BC       LDR              R8,=URL6
+  306 000002B0 F8C8 7000       STR              R7,[R8]
+  307 000002B4 F644 0754       MOV              R7, 0x4854
+  308 000002B8 F8DF 83B4       LDR              R8,=URL7
+  309 000002BC F8C8 7000       STR              R7,[R8]
+  310 000002C0 F245 4750       MOV              R7, 0x5450
+  311 000002C4 F8DF 83AC       LDR              R8,=URL8
+  312 000002C8 F8C8 7000       STR              R7,[R8]
+  313 000002CC F642 7731       MOV              R7, 0x2F31
+  314 000002D0 F8DF 83A4       LDR              R8,=URL9
+  315 000002D4 F8C8 7000       STR              R7,[R8]
+  316 000002D8 F642 6731       MOV              R7, 0x2E31
+  317 000002DC F8DF 839C       LDR              R8,=URL10
+  318 000002E0 F8C8 7000       STR              R7,[R8]
+  319 000002E4 F04F 0700       MOV              R7,#0
+  320 000002E8 F8DF 8394       LDR              R8,=URL11
+  321 000002EC F8C8 7000       STR              R7,[R8]
+  322 000002F0         
+  323 000002F0         ; Se hace un delay de 1 milisegundo (En este caso se esp
                        era 1 tiempo simbólico)
-  327 000002F0 F04F 0701       MOV              R7,#1
-  328 000002F4 B117    DL14    CBZ              R7,GDC7     ;Básicamente lo sac
+  324 000002F0 F04F 0701       MOV              R7,#1
+  325 000002F4 B117    DL14    CBZ              R7,GDC5     ;Básicamente lo sac
                                                             a del loop cuando R
                                                             7(contador del dela
                                                             y en este caso) sea
                                                              cero
-  329 000002F6 F1A7 0701       SUB              R7,R7,#1
-  330 000002FA E7FB            B                DL14        ; Ciclo DL14 = Cuar
+  326 000002F6 F1A7 0701       SUB              R7,R7,#1
+  327 000002FA E7FB            B                DL14        ; Ciclo DL14 = Cuar
                                                             to Delay de 1 tiemp
                                                             o
-  331 000002FC         
-  332 000002FC         
-  333 000002FC         ;Ciclo que realiza el GET de los datos de la cámara de d
+  328 000002FC         
+  329 000002FC         
+  330 000002FC         ;Ciclo que realiza el GET de los datos de la cámara de d
                        istancia
-  334 000002FC         ;Se almacena otro valor simbólico en el espacio de memor
+  331 000002FC         ;Se almacena otro valor simbólico en el espacio de memor
                        ia donde se obtendrían los 4 bytes al hacer un GET al Se
                        rver del sistema. Esto para revisar en memoria y simular
                         el envío de datos distintos
-  335 000002FC F64D 57DD 
-                       GDC7    MOV              R7,0x0000DDDD
-  336 00000300 F8DF 82E0       LDR              R8,=G4BS
-  337 00000304 F8C8 7000       STR              R7,[R8]
-  338 00000308 F04F 0600       MOV              R6,#0       ; Se establece el c
+  332 000002FC F64D 57DD 
+                       GDC5    MOV              R7,0x0000DDDD
+  333 00000300 F8DF 82E0       LDR              R8,=G4BS
+  334 00000304 F8C8 7000       STR              R7,[R8]
+  335 00000308 F04F 0600       MOV              R6,#0       ; Se establece el c
                                                             ontador en 0
-  339 0000030C 4FB5            LDR              R7,=G4BS    ; Se carga en R7 la
+  336 0000030C 4FB5            LDR              R7,=G4BS    ; Se carga en R7 la
                                                              dirección de memor
                                                             ia donde se obtiene
+                                                            n los datos del GET
+                                                            
 
 
 
 ARM Macro Assembler    Page 13 
 
 
-                                                            n los datos del GET
-                                                            
-  340 0000030E         
-  341 0000030E F5B6 7FFA 
-                       GDC8    CMP              R6,#500     ; El valor real es 
+  337 0000030E         
+  338 0000030E F5B6 7FFA 
+                       GDC6    CMP              R6,#500     ; El valor real es 
                                                             4147200, para efect
                                                             os de prueba se dej
                                                             a en 500
-  342 00000312 D007            BEQ              GDC9
-  343 00000314 BF1F 6839       LDRNE            CD,[R7]     ; Se almacena el co
+  339 00000312 D007            BEQ              GDC7
+  340 00000314 BF1F 6839       LDRNE            CD,[R7]     ; Se almacena el co
                                                             ntenido de la direc
                                                             ción guardada en R7
                                                              en el registro de 
                                                             la cámara de distan
                                                             cia
-  344 00000318 F8DF 836C       LDRNE            R8,=DCDD    ; Se almacena en R8
+  341 00000318 F8DF 836C       LDRNE            R8,=DCDD    ; Se almacena en R8
                                                              la dirección de me
                                                             moria donde se alma
                                                             cenan los datos de 
                                                             la cámara de distan
                                                             cia
-  345 0000031C         ;Para guardar los datos de la cámara se usa como base el
+  342 0000031C         ;Para guardar los datos de la cámara se usa como base el
                         valor inicial de R8 y se le suma el offset correspondie
                        nte al valor actual del contador
-  346 0000031C F848 1006       STRNE            CD,[R8,R6]  ; Se guarda lo que 
+  343 0000031C F848 1006       STRNE            CD,[R8,R6]  ; Se guarda lo que 
                                                             hay en el registro 
                                                             de la cámara de dis
                                                             tancia en la direcc
                                                             ión de memoria corr
                                                             espondiente
-  347 00000320 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
+  344 00000320 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
                                                             contador en 4, que 
                                                             es tamaño de los bl
                                                             oques de memoria (4
                                                              bytes)
-  348 00000322 D1F4            BNE              GDC8
-  349 00000324         
-  350 00000324 4770    GDC9    BX               LR
-  351 00000326         
-  352 00000326         
-  353 00000326         
-  354 00000326         ;Paso #2
-  355 00000326         ; Subrutina que se encarga de hacer el request POST de l
+  345 00000322 D1F4            BNE              GDC6
+  346 00000324         
+  347 00000324 4770    GDC7    BX               LR
+  348 00000326         
+  349 00000326         
+  350 00000326         
+  351 00000326         ;Paso #2
+  352 00000326         ; Subrutina que se encarga de hacer el request POST de l
                        os datos obtenidos de las cámaras al Server del sistema
-  356 00000326         
-  357 00000326         ;Establecer la URL de Envío, que en este caso correspond
+  353 00000326         
+  354 00000326         ;Establecer la URL de Envío, que en este caso correspond
                        e con la Operación POST, para mandar los datos de la cám
                        ara térmica
-  358 00000326         ;POST/CT.html HTTP/1.1 = 0x504f53542f43542e68746d6c20485
+  355 00000326         ;POST/CT.html HTTP/1.1 = 0x504f53542f43542e68746d6c20485
                        454502f312e31
-  359 00000326 F245 074F 
+  356 00000326 F245 074F 
                        PDS     MOV              R7, 0x504F
-  360 0000032A F8DF 832C       LDR              R8,=URL1
-  361 0000032E F8C8 7000       STR              R7,[R8]
-  362 00000332 F245 3754       MOV              R7, 0x5354
-  363 00000336 F8DF 8324       LDR              R8,=URL2
-  364 0000033A F8C8 7000       STR              R7,[R8]
-  365 0000033E F642 7743       MOV              R7, 0x2F43
-  366 00000342 F8DF 831C       LDR              R8,=URL3
+  357 0000032A F8DF 832C       LDR              R8,=URL1
+  358 0000032E F8C8 7000       STR              R7,[R8]
+  359 00000332 F245 3754       MOV              R7, 0x5354
+  360 00000336 F8DF 8324       LDR              R8,=URL2
+  361 0000033A F8C8 7000       STR              R7,[R8]
+  362 0000033E F642 7743       MOV              R7, 0x2F43
+  363 00000342 F8DF 831C       LDR              R8,=URL3
+  364 00000346 F8C8 7000       STR              R7,[R8]
+  365 0000034A F245 472E       MOV              R7, 0x542E
 
 
 
 ARM Macro Assembler    Page 14 
 
 
-  367 00000346 F8C8 7000       STR              R7,[R8]
-  368 0000034A F245 472E       MOV              R7, 0x542E
-  369 0000034E F8DF 8314       LDR              R8,=URL4
-  370 00000352 F8C8 7000       STR              R7,[R8]
-  371 00000356 F646 0774       MOV              R7, 0x6874
-  372 0000035A F8DF 830C       LDR              R8,=URL5
-  373 0000035E F8C8 7000       STR              R7,[R8]
-  374 00000362 F646 576C       MOV              R7, 0x6D6C
-  375 00000366 F8DF 8304       LDR              R8,=URL6
-  376 0000036A F8C8 7000       STR              R7,[R8]
-  377 0000036E F242 0748       MOV              R7, 0x2048
-  378 00000372 F8DF 82FC       LDR              R8,=URL7
-  379 00000376 F8C8 7000       STR              R7,[R8]
-  380 0000037A F245 4754       MOV              R7, 0x5454
-  381 0000037E F8DF 82F4       LDR              R8,=URL8
-  382 00000382 F8C8 7000       STR              R7,[R8]
-  383 00000386 F245 072F       MOV              R7, 0x502F
-  384 0000038A F8DF 82EC       LDR              R8,=URL9
-  385 0000038E F8C8 7000       STR              R7,[R8]
-  386 00000392 F243 172E       MOV              R7, 0x312E
-  387 00000396 F8DF 82E4       LDR              R8,=URL10
-  388 0000039A F8C8 7000       STR              R7,[R8]
-  389 0000039E F04F 0731       MOV              R7,0x31
-  390 000003A2 F8DF 82DC       LDR              R8,=URL11
-  391 000003A6 F8C8 7000       STR              R7,[R8]
-  392 000003AA         
-  393 000003AA         ; Se hace un delay de 1 milisegundo (En este caso se esp
+  366 0000034E F8DF 8314       LDR              R8,=URL4
+  367 00000352 F8C8 7000       STR              R7,[R8]
+  368 00000356 F646 0774       MOV              R7, 0x6874
+  369 0000035A F8DF 830C       LDR              R8,=URL5
+  370 0000035E F8C8 7000       STR              R7,[R8]
+  371 00000362 F646 576C       MOV              R7, 0x6D6C
+  372 00000366 F8DF 8304       LDR              R8,=URL6
+  373 0000036A F8C8 7000       STR              R7,[R8]
+  374 0000036E F242 0748       MOV              R7, 0x2048
+  375 00000372 F8DF 82FC       LDR              R8,=URL7
+  376 00000376 F8C8 7000       STR              R7,[R8]
+  377 0000037A F245 4754       MOV              R7, 0x5454
+  378 0000037E F8DF 82F4       LDR              R8,=URL8
+  379 00000382 F8C8 7000       STR              R7,[R8]
+  380 00000386 F245 072F       MOV              R7, 0x502F
+  381 0000038A F8DF 82EC       LDR              R8,=URL9
+  382 0000038E F8C8 7000       STR              R7,[R8]
+  383 00000392 F243 172E       MOV              R7, 0x312E
+  384 00000396 F8DF 82E4       LDR              R8,=URL10
+  385 0000039A F8C8 7000       STR              R7,[R8]
+  386 0000039E F04F 0731       MOV              R7,0x31
+  387 000003A2 F8DF 82DC       LDR              R8,=URL11
+  388 000003A6 F8C8 7000       STR              R7,[R8]
+  389 000003AA         
+  390 000003AA         ; Se hace un delay de 1 milisegundo (En este caso se esp
                        era 1 tiempo simbólico)
-  394 000003AA F04F 0701       MOV              R7,#1
-  395 000003AE B117    DL15    CBZ              R7,PDS2     ;Básicamente lo sac
+  391 000003AA F04F 0701       MOV              R7,#1
+  392 000003AE B117    DL15    CBZ              R7,PDS2     ;Básicamente lo sac
                                                             a del loop cuando R
                                                             7(contador del dela
                                                             y en este caso) sea
                                                              cero
-  396 000003B0 F1A7 0701       SUB              R7,R7,#1
-  397 000003B4 E7FB            B                DL15        ; Ciclo DL15 = Quin
+  393 000003B0 F1A7 0701       SUB              R7,R7,#1
+  394 000003B4 E7FB            B                DL15        ; Ciclo DL15 = Quin
                                                             to Delay de 1 tiemp
                                                             o
-  398 000003B6         
-  399 000003B6         ;Ciclo que realiza el POST de los datos de la cámara tér
+  395 000003B6         
+  396 000003B6         ;Ciclo que realiza el POST de los datos de la cámara tér
                        mica
-  400 000003B6 F04F 0600 
+  397 000003B6 F04F 0600 
                        PDS2    MOV              R6,#0       ; Se establece el c
                                                             ontador en 0
-  401 000003BA 4FB4            LDR              R7,=P4BS    ; Se carga en R7 la
+  398 000003BA 4FB4            LDR              R7,=P4BS    ; Se carga en R7 la
                                                              dirección de memor
                                                             ia donde se guardan
                                                              los datos que será
                                                             n enviados mediante
                                                              la instrucción POS
                                                             T
-  402 000003BC F8DF 82C4       LDR              R8,=DCT     ; Se carga en R8 la
+  399 000003BC F8DF 82C4       LDR              R8,=DCT     ; Se carga en R8 la
                                                              dirección de memor
                                                             ia donde comienzan 
                                                             los datos de la cám
                                                             ara térmica
-  403 000003C0         
-  404 000003C0 F5B6 7FFA 
+  400 000003C0         
+  401 000003C0 F5B6 7FFA 
                        PDS3    CMP              R6,#500     ; El valor real es 
+                                                            153600, para efecto
+                                                            s de prueba se deja
 
 
 
 ARM Macro Assembler    Page 15 
 
 
-                                                            153600, para efecto
-                                                            s de prueba se deja
                                                              en 500
-  405 000003C4 D005            BEQ              PDS4
-  406 000003C6 BF1E F858 
+  402 000003C4 D005            BEQ              PDS4
+  403 000003C6 BF1E F858 
               0006             LDRNE            CT,[R8,R6]
-  407 000003CC 6038            STRNE            CT,[R7]
-  408 000003CE 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
+  404 000003CC 6038            STRNE            CT,[R7]
+  405 000003CE 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
                                                             contador en 4, que 
                                                             es tamaño de los bl
                                                             oques de memoria (4
                                                              bytes)
-  409 000003D0 D1F6            BNE              PDS3
-  410 000003D2         
-  411 000003D2         ;Establecer la URL de Envío, que en este caso correspond
+  406 000003D0 D1F6            BNE              PDS3
+  407 000003D2         
+  408 000003D2         ;Establecer la URL de Envío, que en este caso correspond
                        e con la Operación POST, para mandar los datos de la cám
                        ara de distancia
-  412 000003D2         ;POST/CD.html HTTP/1.1 = 0x504f53542f43442e68746d6c20485
+  409 000003D2         ;POST/CD.html HTTP/1.1 = 0x504f53542f43442e68746d6c20485
                        454502f312e31
-  413 000003D2         
-  414 000003D2 F245 074F 
+  410 000003D2         
+  411 000003D2 F245 074F 
                        PDS4    MOV              R7, 0x504F
-  415 000003D6 F8DF 8280       LDR              R8,=URL1
-  416 000003DA F8C8 7000       STR              R7,[R8]
-  417 000003DE F245 3754       MOV              R7, 0x5354
-  418 000003E2 F8DF 8278       LDR              R8,=URL2
-  419 000003E6 F8C8 7000       STR              R7,[R8]
-  420 000003EA F642 7743       MOV              R7, 0x2F43
-  421 000003EE F8DF 8270       LDR              R8,=URL3
-  422 000003F2 F8C8 7000       STR              R7,[R8]
-  423 000003F6 F244 472E       MOV              R7, 0x442E
-  424 000003FA F8DF 8268       LDR              R8,=URL4
-  425 000003FE F8C8 7000       STR              R7,[R8]
-  426 00000402 F646 0774       MOV              R7, 0x6874
-  427 00000406 F8DF 8260       LDR              R8,=URL5
-  428 0000040A F8C8 7000       STR              R7,[R8]
-  429 0000040E F646 576C       MOV              R7, 0x6D6C
-  430 00000412 F8DF 8258       LDR              R8,=URL6
-  431 00000416 F8C8 7000       STR              R7,[R8]
-  432 0000041A F242 0748       MOV              R7, 0x2048
-  433 0000041E F8DF 8250       LDR              R8,=URL7
-  434 00000422 F8C8 7000       STR              R7,[R8]
-  435 00000426 F245 4754       MOV              R7, 0x5454
-  436 0000042A F8DF 8248       LDR              R8,=URL8
-  437 0000042E F8C8 7000       STR              R7,[R8]
-  438 00000432 F245 072F       MOV              R7, 0x502F
-  439 00000436 F8DF 8240       LDR              R8,=URL9
-  440 0000043A F8C8 7000       STR              R7,[R8]
-  441 0000043E F243 172E       MOV              R7, 0x312E
-  442 00000442 F8DF 8238       LDR              R8,=URL10
-  443 00000446 F8C8 7000       STR              R7,[R8]
-  444 0000044A F04F 0731       MOV              R7, 0x31
-  445 0000044E F8DF 8230       LDR              R8,=URL11
-  446 00000452 F8C8 7000       STR              R7,[R8]
-  447 00000456         
-  448 00000456         ; Se hace un delay de 1 milisegundo (En este caso se esp
+  412 000003D6 F8DF 8280       LDR              R8,=URL1
+  413 000003DA F8C8 7000       STR              R7,[R8]
+  414 000003DE F245 3754       MOV              R7, 0x5354
+  415 000003E2 F8DF 8278       LDR              R8,=URL2
+  416 000003E6 F8C8 7000       STR              R7,[R8]
+  417 000003EA F642 7743       MOV              R7, 0x2F43
+  418 000003EE F8DF 8270       LDR              R8,=URL3
+  419 000003F2 F8C8 7000       STR              R7,[R8]
+  420 000003F6 F244 472E       MOV              R7, 0x442E
+  421 000003FA F8DF 8268       LDR              R8,=URL4
+  422 000003FE F8C8 7000       STR              R7,[R8]
+  423 00000402 F646 0774       MOV              R7, 0x6874
+  424 00000406 F8DF 8260       LDR              R8,=URL5
+  425 0000040A F8C8 7000       STR              R7,[R8]
+  426 0000040E F646 576C       MOV              R7, 0x6D6C
+  427 00000412 F8DF 8258       LDR              R8,=URL6
+  428 00000416 F8C8 7000       STR              R7,[R8]
+  429 0000041A F242 0748       MOV              R7, 0x2048
+  430 0000041E F8DF 8250       LDR              R8,=URL7
+  431 00000422 F8C8 7000       STR              R7,[R8]
+  432 00000426 F245 4754       MOV              R7, 0x5454
+  433 0000042A F8DF 8248       LDR              R8,=URL8
+  434 0000042E F8C8 7000       STR              R7,[R8]
+  435 00000432 F245 072F       MOV              R7, 0x502F
+  436 00000436 F8DF 8240       LDR              R8,=URL9
+  437 0000043A F8C8 7000       STR              R7,[R8]
+  438 0000043E F243 172E       MOV              R7, 0x312E
+  439 00000442 F8DF 8238       LDR              R8,=URL10
+  440 00000446 F8C8 7000       STR              R7,[R8]
+  441 0000044A F04F 0731       MOV              R7, 0x31
+  442 0000044E F8DF 8230       LDR              R8,=URL11
+  443 00000452 F8C8 7000       STR              R7,[R8]
+  444 00000456         
+  445 00000456         ; Se hace un delay de 1 milisegundo (En este caso se esp
                        era 1 tiempo simbólico)
-  449 00000456 F04F 0701       MOV              R7,#1
-  450 0000045A B117    DL16    CBZ              R7,PDS5     ;Básicamente lo sac
+  446 00000456 F04F 0701       MOV              R7,#1
+  447 0000045A B117    DL16    CBZ              R7,PDS5     ;Básicamente lo sac
+                                                            a del loop cuando R
+                                                            7(contador del dela
 
 
 
 ARM Macro Assembler    Page 16 
 
 
-                                                            a del loop cuando R
-                                                            7(contador del dela
                                                             y en este caso) sea
                                                              cero
-  451 0000045C F1A7 0701       SUB              R7,R7,#1
-  452 00000460 E7FB            B                DL16        ; Ciclo DL16 = Sext
+  448 0000045C F1A7 0701       SUB              R7,R7,#1
+  449 00000460 E7FB            B                DL16        ; Ciclo DL16 = Sext
                                                             o Delay de 1 tiempo
                                                             
-  453 00000462         
-  454 00000462         
-  455 00000462         ;Ciclo que realiza el POST de los datos de la cámara de 
+  450 00000462         
+  451 00000462         
+  452 00000462         ;Ciclo que realiza el POST de los datos de la cámara de 
                        distancia
-  456 00000462 F04F 0600 
+  453 00000462 F04F 0600 
                        PDS5    MOV              R6,#0       ; Se establece el c
                                                             ontador en 0
-  457 00000466 4F89            LDR              R7,=P4BS    ; Se carga en R7 la
+  454 00000466 4F89            LDR              R7,=P4BS    ; Se carga en R7 la
                                                              dirección de memor
                                                             ia donde se guardan
                                                              los datos que será
                                                             n enviados mediante
                                                              la instrucción POS
                                                             T
-  458 00000468 F8DF 821C       LDR              R8,=DCDD    ; Se carga en R8 la
+  455 00000468 F8DF 821C       LDR              R8,=DCDD    ; Se carga en R8 la
                                                              dirección de memor
                                                             ia donde comienzan 
                                                             los datos de la cám
                                                             ara de distancia
-  459 0000046C         
-  460 0000046C F5B6 7FFA 
+  456 0000046C         
+  457 0000046C F5B6 7FFA 
                        PDS6    CMP              R6,#500     ; El valor real es 
                                                             4147200, para efect
                                                             os de prueba se dej
                                                             a en 500
-  461 00000470 D005            BEQ              PDS7
-  462 00000472 BF1E F858 
+  458 00000470 D005            BEQ              PDS7
+  459 00000472 BF1E F858 
               1006             LDRNE            CD,[R8,R6]
-  463 00000478 6039            STRNE            CD,[R7]
-  464 0000047A 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
+  460 00000478 6039            STRNE            CD,[R7]
+  461 0000047A 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
                                                             contador en 4, que 
                                                             es tamaño de los bl
                                                             oques de memoria (4
                                                              bytes)
-  465 0000047C D1F6            BNE              PDS6
-  466 0000047E         
-  467 0000047E 4770    PDS7    BX               LR
-  468 00000480         
-  469 00000480         ;Paso #3
-  470 00000480         ; Subrutina que se encarga de hacer el request GET al Se
+  462 0000047C D1F6            BNE              PDS6
+  463 0000047E         
+  464 0000047E 4770    PDS7    BX               LR
+  465 00000480         
+  466 00000480         ;Paso #3
+  467 00000480         ; Subrutina que se encarga de hacer el request GET al Se
                        rver del Mensaje de que se proyectará en el LCD y del có
                        digo de activación de las alarmas
-  471 00000480         
-  472 00000480         ;Establecer la URL de Envío, que en este caso correspond
+  468 00000480         
+  469 00000480         ;Establecer la URL de Envío, que en este caso correspond
                        e con la Operación GET, para obtener los datos del mensa
                        je del server
-  473 00000480         ;GET/MS.html HTTP/1.1 = 0x4745542f4d532e68746d6c20485454
+  470 00000480         ;GET/MS.html HTTP/1.1 = 0x4745542f4d532e68746d6c20485454
                        502f312e31
-  474 00000480 F244 7745 
+  471 00000480 F244 7745 
                        GMA     MOV              R7, 0x4745
-  475 00000484 F8DF 81D0       LDR              R8,=URL1
+  472 00000484 F8DF 81D0       LDR              R8,=URL1
+  473 00000488 F8C8 7000       STR              R7,[R8]
+  474 0000048C F245 472F       MOV              R7, 0x542F
 
 
 
 ARM Macro Assembler    Page 17 
 
 
-  476 00000488 F8C8 7000       STR              R7,[R8]
-  477 0000048C F245 472F       MOV              R7, 0x542F
-  478 00000490 F8DF 81C8       LDR              R8,=URL2
-  479 00000494 F8C8 7000       STR              R7,[R8]
-  480 00000498 F644 5753       MOV              R7, 0x4D53
-  481 0000049C F8DF 81C0       LDR              R8,=URL3
-  482 000004A0 F8C8 7000       STR              R7,[R8]
-  483 000004A4 F642 6768       MOV              R7, 0x2E68
-  484 000004A8 F8DF 81B8       LDR              R8,=URL4
-  485 000004AC F8C8 7000       STR              R7,[R8]
-  486 000004B0 F247 476D       MOV              R7, 0x746D
-  487 000004B4 F8DF 81B0       LDR              R8,=URL5
-  488 000004B8 F8C8 7000       STR              R7,[R8]
-  489 000004BC F646 4720       MOV              R7, 0x6C20
-  490 000004C0 F8DF 81A8       LDR              R8,=URL6
-  491 000004C4 F8C8 7000       STR              R7,[R8]
-  492 000004C8 F644 0754       MOV              R7, 0x4854
-  493 000004CC F8DF 81A0       LDR              R8,=URL7
-  494 000004D0 F8C8 7000       STR              R7,[R8]
-  495 000004D4 F245 4750       MOV              R7, 0x5450
-  496 000004D8 F8DF 8198       LDR              R8,=URL8
-  497 000004DC F8C8 7000       STR              R7,[R8]
-  498 000004E0 F642 7731       MOV              R7, 0x2F31
-  499 000004E4 F8DF 8190       LDR              R8,=URL9
-  500 000004E8 F8C8 7000       STR              R7,[R8]
-  501 000004EC F642 6731       MOV              R7, 0x2E31
-  502 000004F0 F8DF 8188       LDR              R8,=URL10
-  503 000004F4 F8C8 7000       STR              R7,[R8]
-  504 000004F8 F04F 0700       MOV              R7,#0
-  505 000004FC F8DF 8180       LDR              R8,=URL11
-  506 00000500 F8C8 7000       STR              R7,[R8]
-  507 00000504         
-  508 00000504         ;Se alamcena otro valor simbólico en el espacio de memor
+  475 00000490 F8DF 81C8       LDR              R8,=URL2
+  476 00000494 F8C8 7000       STR              R7,[R8]
+  477 00000498 F644 5753       MOV              R7, 0x4D53
+  478 0000049C F8DF 81C0       LDR              R8,=URL3
+  479 000004A0 F8C8 7000       STR              R7,[R8]
+  480 000004A4 F642 6768       MOV              R7, 0x2E68
+  481 000004A8 F8DF 81B8       LDR              R8,=URL4
+  482 000004AC F8C8 7000       STR              R7,[R8]
+  483 000004B0 F247 476D       MOV              R7, 0x746D
+  484 000004B4 F8DF 81B0       LDR              R8,=URL5
+  485 000004B8 F8C8 7000       STR              R7,[R8]
+  486 000004BC F646 4720       MOV              R7, 0x6C20
+  487 000004C0 F8DF 81A8       LDR              R8,=URL6
+  488 000004C4 F8C8 7000       STR              R7,[R8]
+  489 000004C8 F644 0754       MOV              R7, 0x4854
+  490 000004CC F8DF 81A0       LDR              R8,=URL7
+  491 000004D0 F8C8 7000       STR              R7,[R8]
+  492 000004D4 F245 4750       MOV              R7, 0x5450
+  493 000004D8 F8DF 8198       LDR              R8,=URL8
+  494 000004DC F8C8 7000       STR              R7,[R8]
+  495 000004E0 F642 7731       MOV              R7, 0x2F31
+  496 000004E4 F8DF 8190       LDR              R8,=URL9
+  497 000004E8 F8C8 7000       STR              R7,[R8]
+  498 000004EC F642 6731       MOV              R7, 0x2E31
+  499 000004F0 F8DF 8188       LDR              R8,=URL10
+  500 000004F4 F8C8 7000       STR              R7,[R8]
+  501 000004F8 F04F 0700       MOV              R7,#0
+  502 000004FC F8DF 8180       LDR              R8,=URL11
+  503 00000500 F8C8 7000       STR              R7,[R8]
+  504 00000504         
+  505 00000504         ;Se alamcena otro valor simbólico en el espacio de memor
                        ia donde se obtendrían los 4 bytes al hacer un GET al Se
                        rver del sistema, para efectos de pruebas
-  509 00000504 F64A 27AA       MOV              R7,0x0000AAAA
-  510 00000508 F8DF 80D8       LDR              R8,=G4BS
-  511 0000050C F8C8 7000       STR              R7,[R8]
-  512 00000510         
-  513 00000510         ; Se hace un delay de 1 milisegundo (En este caso se esp
+  506 00000504 F64A 27AA       MOV              R7,0x0000AAAA
+  507 00000508 F8DF 80D8       LDR              R8,=G4BS
+  508 0000050C F8C8 7000       STR              R7,[R8]
+  509 00000510         
+  510 00000510         ; Se hace un delay de 1 milisegundo (En este caso se esp
                        era 1 tiempo simbólico)
-  514 00000510 F04F 0701       MOV              R7,#1
-  515 00000514 B117    DL17    CBZ              R7,GMA2     ;Básicamente lo sac
+  511 00000510 F04F 0701       MOV              R7,#1
+  512 00000514 B117    DL17    CBZ              R7,GMA2     ;Básicamente lo sac
                                                             a del loop cuando R
                                                             7(contador del dela
                                                             y en este caso) sea
                                                              cero
-  516 00000516 F1A7 0701       SUB              R7,R7,#1
-  517 0000051A E7FB            B                DL17        ; Ciclo DL17 = Sépt
+  513 00000516 F1A7 0701       SUB              R7,R7,#1
+  514 0000051A E7FB            B                DL17        ; Ciclo DL17 = Sépt
                                                             imo Delay de 1 tiem
                                                             po
-  518 0000051C         
-  519 0000051C         ; Ciclo que realiza el GET de los datos del mensaje del 
+  515 0000051C         
+  516 0000051C         ; Ciclo que realiza el GET de los datos del mensaje del 
                        server
-  520 0000051C F04F 0600 
+  517 0000051C F04F 0600 
                        GMA2    MOV              R6,#0       ; Se establece el c
                                                             ontador en 0
-  521 00000520 4F30            LDR              R7,=G4BS    ; Se carga en R7 la
+  518 00000520 4F30            LDR              R7,=G4BS    ; Se carga en R7 la
                                                              dirección de memor
+                                                            ia donde se obtiene
+                                                            n los datos del GET
 
 
 
 ARM Macro Assembler    Page 18 
 
 
-                                                            ia donde se obtiene
-                                                            n los datos del GET
                                                             
-  522 00000522         
-  523 00000522 2E2C    GMA3    CMP              R6,#44      ; Se deben llenar 1
+  519 00000522         
+  520 00000522 2E2C    GMA3    CMP              R6,#44      ; Se deben llenar 1
                                                             1 bloques de memori
                                                             a con 4 bytes cadda
                                                              uno, para obtener 
                                                             el mensaje completo
                                                              del server 
-  524 00000524 D007            BEQ              GMA4
-  525 00000526 BF1F 683B       LDRNE            MS,[R7]     ; Se almacena el co
+  521 00000524 D007            BEQ              GMA4
+  522 00000526 BF1F 683B       LDRNE            MS,[R7]     ; Se almacena el co
                                                             ntenido de la direc
                                                             ción guardada en R7
                                                              en el registro del
                                                              mensaje del server
                                                             
-  526 0000052A F8DF 8164       LDRNE            R8,=DMS     ; Se almacena en R8
+  523 0000052A F8DF 8164       LDRNE            R8,=DMS     ; Se almacena en R8
                                                              la dirección de me
                                                             moria donde se alma
                                                             cenan los datos del
                                                              mensaje del server
                                                             
-  527 0000052E         ;Para guardar el mensaje del server se usa como base el 
+  524 0000052E         ;Para guardar el mensaje del server se usa como base el 
                        valor inicial de R8 y se le suma el offset correspondien
                        te al valor actual del contador
-  528 0000052E F848 3006       STRNE            MS,[R8,R6]  ; Se guarda lo que 
+  525 0000052E F848 3006       STRNE            MS,[R8,R6]  ; Se guarda lo que 
                                                             hay en el registro 
                                                             del mensaje del ser
                                                             ver en la dirección
                                                              de memoria corresp
                                                             ondiente
-  529 00000532 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
+  526 00000532 1D36            ADDNE            R6,R6,#4    ; Se incrementa el 
                                                             contador en 4, que 
                                                             es tamaño de los bl
                                                             oques de memoria (4
                                                              bytes)
-  530 00000534 D1F5            BNE              GMA3
-  531 00000536         
-  532 00000536         ;Establecer la URL de Envío, que en este caso correspond
+  527 00000534 D1F5            BNE              GMA3
+  528 00000536         
+  529 00000536         ;Establecer la URL de Envío, que en este caso correspond
                        e con la Operación GET, para el valor de alarmas enviado
                         por el server
-  533 00000536         ;GET/AS.html HTTP/1.1 = 0x4745542f41532e68746d6c20485454
+  530 00000536         ;GET/AS.html HTTP/1.1 = 0x4745542f41532e68746d6c20485454
                        502f312e31
-  534 00000536 F244 7745 
+  531 00000536 F244 7745 
                        GMA4    MOV              R7, 0x4745
-  535 0000053A F8DF 811C       LDR              R8,=URL1
-  536 0000053E F8C8 7000       STR              R7,[R8]
-  537 00000542 F245 472F       MOV              R7, 0x542F
-  538 00000546 F8DF 8114       LDR              R8,=URL2
-  539 0000054A F8C8 7000       STR              R7,[R8]
-  540 0000054E F244 1753       MOV              R7, 0x4153
-  541 00000552 F8DF 810C       LDR              R8,=URL3
-  542 00000556 F8C8 7000       STR              R7,[R8]
-  543 0000055A F642 6768       MOV              R7, 0x2E68
-  544 0000055E F8DF 8104       LDR              R8,=URL4
-  545 00000562 F8C8 7000       STR              R7,[R8]
-  546 00000566 F247 476D       MOV              R7, 0x746D
-  547 0000056A F8DF 80FC       LDR              R8,=URL5
+  532 0000053A F8DF 811C       LDR              R8,=URL1
+  533 0000053E F8C8 7000       STR              R7,[R8]
+  534 00000542 F245 472F       MOV              R7, 0x542F
+  535 00000546 F8DF 8114       LDR              R8,=URL2
+  536 0000054A F8C8 7000       STR              R7,[R8]
+  537 0000054E F244 1753       MOV              R7, 0x4153
+  538 00000552 F8DF 810C       LDR              R8,=URL3
+  539 00000556 F8C8 7000       STR              R7,[R8]
+  540 0000055A F642 6768       MOV              R7, 0x2E68
+  541 0000055E F8DF 8104       LDR              R8,=URL4
+  542 00000562 F8C8 7000       STR              R7,[R8]
+  543 00000566 F247 476D       MOV              R7, 0x746D
+  544 0000056A F8DF 80FC       LDR              R8,=URL5
+  545 0000056E F8C8 7000       STR              R7,[R8]
+  546 00000572 F646 4720       MOV              R7, 0x6C20
 
 
 
 ARM Macro Assembler    Page 19 
 
 
-  548 0000056E F8C8 7000       STR              R7,[R8]
-  549 00000572 F646 4720       MOV              R7, 0x6C20
-  550 00000576 F8DF 80F4       LDR              R8,=URL6
-  551 0000057A F8C8 7000       STR              R7,[R8]
-  552 0000057E F644 0754       MOV              R7, 0x4854
-  553 00000582 F8DF 80EC       LDR              R8,=URL7
-  554 00000586 F8C8 7000       STR              R7,[R8]
-  555 0000058A F245 4750       MOV              R7, 0x5450
-  556 0000058E F8DF 80E4       LDR              R8,=URL8
-  557 00000592 F8C8 7000       STR              R7,[R8]
-  558 00000596 F642 7731       MOV              R7, 0x2F31
-  559 0000059A F8DF 80DC       LDR              R8,=URL9
-  560 0000059E F8C8 7000       STR              R7,[R8]
-  561 000005A2 F642 6731       MOV              R7, 0x2e31
-  562 000005A6 F8DF 80D4       LDR              R8,=URL10
-  563 000005AA F8C8 7000       STR              R7,[R8]
-  564 000005AE F04F 0700       MOV              R7,#0
-  565 000005B2 F8DF 80CC       LDR              R8,=URL11
-  566 000005B6 F8C8 7000       STR              R7,[R8]
-  567 000005BA         
-  568 000005BA         ;Se alamcena otro valor simbólico en el espacio de memor
+  547 00000576 F8DF 80F4       LDR              R8,=URL6
+  548 0000057A F8C8 7000       STR              R7,[R8]
+  549 0000057E F644 0754       MOV              R7, 0x4854
+  550 00000582 F8DF 80EC       LDR              R8,=URL7
+  551 00000586 F8C8 7000       STR              R7,[R8]
+  552 0000058A F245 4750       MOV              R7, 0x5450
+  553 0000058E F8DF 80E4       LDR              R8,=URL8
+  554 00000592 F8C8 7000       STR              R7,[R8]
+  555 00000596 F642 7731       MOV              R7, 0x2F31
+  556 0000059A F8DF 80DC       LDR              R8,=URL9
+  557 0000059E F8C8 7000       STR              R7,[R8]
+  558 000005A2 F642 6731       MOV              R7, 0x2e31
+  559 000005A6 F8DF 80D4       LDR              R8,=URL10
+  560 000005AA F8C8 7000       STR              R7,[R8]
+  561 000005AE F04F 0700       MOV              R7,#0
+  562 000005B2 F8DF 80CC       LDR              R8,=URL11
+  563 000005B6 F8C8 7000       STR              R7,[R8]
+  564 000005BA         
+  565 000005BA         ;Se alamcena otro valor simbólico en el espacio de memor
                        ia donde se obtendrían los 4 bytes al hacer un GET al Se
                        rver del sistema, para efectos de pruebas
-  569 000005BA F64E 27EA       MOV              R7,0x0000EAEA
-  570 000005BE F8DF 8024       LDR              R8,=G4BS
-  571 000005C2 F8C8 7000       STR              R7,[R8]
-  572 000005C6         
-  573 000005C6         ; Se hace un delay de 1 milisegundo (En este caso se esp
+  566 000005BA F64E 27EA       MOV              R7,0x0000EAEA
+  567 000005BE F8DF 8024       LDR              R8,=G4BS
+  568 000005C2 F8C8 7000       STR              R7,[R8]
+  569 000005C6         
+  570 000005C6         ; Se hace un delay de 1 milisegundo (En este caso se esp
                        era 1 tiempo simbólico)
-  574 000005C6 F04F 0701       MOV              R7,#1
-  575 000005CA B117    DL18    CBZ              R7,GMA5     ;Básicamente lo sac
+  571 000005C6 F04F 0701       MOV              R7,#1
+  572 000005CA B117    DL18    CBZ              R7,GMA5     ;Básicamente lo sac
                                                             a del loop cuando R
                                                             7(contador del dela
                                                             y en este caso) sea
                                                              cero
-  576 000005CC F1A7 0701       SUB              R7,R7,#1
-  577 000005D0 E7FB            B                DL18        ; Ciclo DL18 = Octa
+  573 000005CC F1A7 0701       SUB              R7,R7,#1
+  574 000005D0 E7FB            B                DL18        ; Ciclo DL18 = Octa
                                                             vo Delay de 1 tiemp
                                                             o
-  578 000005D2         
-  579 000005D2         ;Subrutina que se encarga de almacenar en memoria el val
+  575 000005D2         
+  576 000005D2         ;Subrutina que se encarga de almacenar en memoria el val
                        or obtenido al hacer el GET al Server del activador de l
                        as alarmas
-  580 000005D2 4F04    GMA5    LDR              R7,=G4BS    ; Se carga en R7 la
+  577 000005D2 4F04    GMA5    LDR              R7,=G4BS    ; Se carga en R7 la
                                                              dirección de memor
                                                             ia donde se obtiene
                                                             n los datos del GET
                                                             
-  581 000005D4 F8DF 80BC       LDR              R8,=DAS     ; Se almacena en R8
+  578 000005D4 F8DF 80BC       LDR              R8,=DAS     ; Se almacena en R8
                                                              la dirección de me
                                                             moria donde se alma
                                                             cenan los datos del
                                                              activador de las a
                                                             larmas
-  582 000005D8 683A            LDR              AS,[R7]
-  583 000005DA F8C8 2000       STR              AS,[R8]
-  584 000005DE 4770            BX               LR
-  585 000005E0         
-  586 000005E0         
+  579 000005D8 683A            LDR              AS,[R7]
+  580 000005DA F8C8 2000       STR              AS,[R8]
+  581 000005DE 4770            BX               LR
+  582 000005E0         
+  583 000005E0         
+  584 000005E0         ; Paso #4
+  585 000005E0         ; Subrutina que se encarga de mandar al LCD el mensaje o
 
 
 
 ARM Macro Assembler    Page 20 
 
 
-  587 000005E0         
-  588 000005E0         
-  589 000005E0         
-  590 000005E0         ; Paso #4
-  591 000005E0         ; Subrutina que se encarga de mandar al LCD el mensaje o
                        btenido através del servidor y de activar o no las alarm
                        as dependiendo de lo obtenido por el Server
-  592 000005E0         
-  593 000005E0 F7FF FD10 
+  586 000005E0         
+  587 000005E0 F7FF FD10 
                        EMA     BL               INF         ; Se regresa al Bra
                                                             nch INF para genera
                                                             r un loop infinito
-  594 000005E4         
-  595 000005E4         
-  596 000005E4                 END
+  588 000005E4         
+  589 000005E4         
+  590 000005E4                 END
               200000A8 
               2000000C 
               20000010 
@@ -1298,17 +1293,17 @@ ARM Macro Assembler    Page 20
               200002A0 
               20000494 
               20000498 
+              200004C4 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
+ork --depend=.\objects\main.d -o.\objects\main.o -I.\RTE\_Cortex-M3 -IC:\Users\
+User\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Users\User
+\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\Device\ARM\ARMCM3\Include --predefine=
 
 
 
 ARM Macro Assembler    Page 21 
 
 
-              200004C4 
-Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
-ork --depend=.\objects\main.d -o.\objects\main.o -I.\RTE\_Cortex-M3 -IC:\Users\
-User\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Users\User
-\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\Device\ARM\ARMCM3\Include --predefine=
 "__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION 
 SETA 529" --predefine="_RTE_ SETA 1" --predefine="ARMCM3 SETA 1" --list=.\listi
 ngs\main.lst main.s
@@ -1318,61 +1313,61 @@ ngs\main.lst main.s
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
-DL1 000000A4
+DL1 000000A2
 
 Symbol: DL1
    Definitions
-      At line 142 in file main.s
+      At line 135 in file main.s
    Uses
-      At line 144 in file main.s
+      At line 137 in file main.s
 Comment: DL1 used once
-DL12 00000164
+DL12 00000162
 
 Symbol: DL12
    Definitions
-      At line 203 in file main.s
+      At line 196 in file main.s
    Uses
-      At line 205 in file main.s
+      At line 198 in file main.s
 Comment: DL12 used once
 DL13 00000248
 
 Symbol: DL13
    Definitions
-      At line 270 in file main.s
+      At line 267 in file main.s
    Uses
-      At line 272 in file main.s
+      At line 269 in file main.s
 Comment: DL13 used once
 DL14 000002F4
 
 Symbol: DL14
    Definitions
-      At line 328 in file main.s
+      At line 325 in file main.s
    Uses
-      At line 330 in file main.s
+      At line 327 in file main.s
 Comment: DL14 used once
 DL15 000003AE
 
 Symbol: DL15
    Definitions
-      At line 395 in file main.s
+      At line 392 in file main.s
    Uses
-      At line 397 in file main.s
+      At line 394 in file main.s
 Comment: DL15 used once
 DL16 0000045A
 
 Symbol: DL16
    Definitions
-      At line 450 in file main.s
+      At line 447 in file main.s
    Uses
-      At line 452 in file main.s
+      At line 449 in file main.s
 Comment: DL16 used once
 DL17 00000514
 
 Symbol: DL17
    Definitions
-      At line 515 in file main.s
+      At line 512 in file main.s
    Uses
-      At line 517 in file main.s
+      At line 514 in file main.s
 Comment: DL17 used once
 DL18 000005CA
 
@@ -1384,9 +1379,9 @@ ARM Macro Assembler    Page 2 Alphabetic symbol ordering
 Relocatable symbols
 
    Definitions
-      At line 575 in file main.s
+      At line 572 in file main.s
    Uses
-      At line 577 in file main.s
+      At line 574 in file main.s
 Comment: DL18 used once
 DL2 0000004E
 
@@ -1400,47 +1395,47 @@ EMA 000005E0
 
 Symbol: EMA
    Definitions
-      At line 593 in file main.s
+      At line 587 in file main.s
    Uses
       At line 81 in file main.s
 Comment: EMA used once
-GDC 00000058
+GDC 000001C0
 
 Symbol: GDC
    Definitions
-      At line 120 in file main.s
+      At line 230 in file main.s
    Uses
       At line 78 in file main.s
 Comment: GDC used once
-GDC2 000000AC
+GDC2 00000250
 
 Symbol: GDC2
    Definitions
-      At line 149 in file main.s
+      At line 274 in file main.s
    Uses
-      At line 142 in file main.s
+      At line 267 in file main.s
 Comment: GDC2 used once
-GDC3 0000016C
+GDC3 00000256
 
 Symbol: GDC3
    Definitions
-      At line 209 in file main.s
+      At line 277 in file main.s
    Uses
-      At line 203 in file main.s
+      At line 284 in file main.s
 Comment: GDC3 used once
-GDC4 00000250
+GDC4 0000026C
 
 Symbol: GDC4
    Definitions
-      At line 277 in file main.s
+      At line 289 in file main.s
    Uses
-      At line 270 in file main.s
+      At line 278 in file main.s
 Comment: GDC4 used once
-GDC5 00000256
+GDC5 000002FC
 
 Symbol: GDC5
    Definitions
-      At line 280 in file main.s
+      At line 332 in file main.s
    Uses
 
 
@@ -1448,45 +1443,29 @@ Symbol: GDC5
 ARM Macro Assembler    Page 3 Alphabetic symbol ordering
 Relocatable symbols
 
-      At line 287 in file main.s
+      At line 325 in file main.s
 Comment: GDC5 used once
-GDC6 0000026C
+GDC6 0000030E
 
 Symbol: GDC6
    Definitions
-      At line 292 in file main.s
+      At line 338 in file main.s
    Uses
-      At line 281 in file main.s
+      At line 345 in file main.s
 Comment: GDC6 used once
-GDC7 000002FC
+GDC7 00000324
 
 Symbol: GDC7
    Definitions
-      At line 335 in file main.s
+      At line 347 in file main.s
    Uses
-      At line 328 in file main.s
+      At line 339 in file main.s
 Comment: GDC7 used once
-GDC8 0000030E
-
-Symbol: GDC8
-   Definitions
-      At line 341 in file main.s
-   Uses
-      At line 348 in file main.s
-Comment: GDC8 used once
-GDC9 00000324
-
-Symbol: GDC9
-   Definitions
-      At line 350 in file main.s
-   Uses
-      At line 342 in file main.s
-Comment: GDC9 used once
 GMA 00000480
 
 Symbol: GMA
    Definitions
-      At line 474 in file main.s
+      At line 471 in file main.s
    Uses
       At line 80 in file main.s
 Comment: GMA used once
@@ -1494,19 +1473,35 @@ GMA2 0000051C
 
 Symbol: GMA2
    Definitions
-      At line 520 in file main.s
+      At line 517 in file main.s
    Uses
-      At line 515 in file main.s
+      At line 512 in file main.s
 Comment: GMA2 used once
 GMA3 00000522
 
 Symbol: GMA3
    Definitions
-      At line 523 in file main.s
+      At line 520 in file main.s
    Uses
-      At line 530 in file main.s
+      At line 527 in file main.s
 Comment: GMA3 used once
 GMA4 00000536
+
+Symbol: GMA4
+   Definitions
+      At line 531 in file main.s
+   Uses
+      At line 521 in file main.s
+Comment: GMA4 used once
+GMA5 000005D2
+
+Symbol: GMA5
+   Definitions
+      At line 577 in file main.s
+   Uses
+      At line 572 in file main.s
+Comment: GMA5 used once
+INF 00000004
 
 
 
@@ -1514,27 +1509,11 @@ ARM Macro Assembler    Page 4 Alphabetic symbol ordering
 Relocatable symbols
 
 
-Symbol: GMA4
-   Definitions
-      At line 534 in file main.s
-   Uses
-      At line 524 in file main.s
-Comment: GMA4 used once
-GMA5 000005D2
-
-Symbol: GMA5
-   Definitions
-      At line 580 in file main.s
-   Uses
-      At line 575 in file main.s
-Comment: GMA5 used once
-INF 00000004
-
 Symbol: INF
    Definitions
       At line 78 in file main.s
    Uses
-      At line 593 in file main.s
+      At line 587 in file main.s
 Comment: INF used once
 Main 00000000
 
@@ -1548,7 +1527,7 @@ PDS 00000326
 
 Symbol: PDS
    Definitions
-      At line 359 in file main.s
+      At line 356 in file main.s
    Uses
       At line 79 in file main.s
 Comment: PDS used once
@@ -1556,21 +1535,37 @@ PDS2 000003B6
 
 Symbol: PDS2
    Definitions
-      At line 400 in file main.s
+      At line 397 in file main.s
    Uses
-      At line 395 in file main.s
+      At line 392 in file main.s
 Comment: PDS2 used once
 PDS3 000003C0
 
 Symbol: PDS3
    Definitions
-      At line 404 in file main.s
+      At line 401 in file main.s
    Uses
-      At line 409 in file main.s
+      At line 406 in file main.s
 Comment: PDS3 used once
 PDS4 000003D2
 
 Symbol: PDS4
+   Definitions
+      At line 411 in file main.s
+   Uses
+      At line 402 in file main.s
+Comment: PDS4 used once
+PDS5 00000462
+
+Symbol: PDS5
+   Definitions
+      At line 453 in file main.s
+   Uses
+      At line 447 in file main.s
+Comment: PDS5 used once
+PDS6 0000046C
+
+Symbol: PDS6
    Definitions
 
 
@@ -1578,33 +1573,17 @@ Symbol: PDS4
 ARM Macro Assembler    Page 5 Alphabetic symbol ordering
 Relocatable symbols
 
-      At line 414 in file main.s
+      At line 457 in file main.s
    Uses
-      At line 405 in file main.s
-Comment: PDS4 used once
-PDS5 00000462
-
-Symbol: PDS5
-   Definitions
-      At line 456 in file main.s
-   Uses
-      At line 450 in file main.s
-Comment: PDS5 used once
-PDS6 0000046C
-
-Symbol: PDS6
-   Definitions
-      At line 460 in file main.s
-   Uses
-      At line 465 in file main.s
+      At line 462 in file main.s
 Comment: PDS6 used once
 PDS7 0000047E
 
 Symbol: PDS7
    Definitions
-      At line 467 in file main.s
+      At line 464 in file main.s
    Uses
-      At line 461 in file main.s
+      At line 458 in file main.s
 Comment: PDS7 used once
 SMW 00000014
 
@@ -1618,10 +1597,26 @@ SMW2 00000056
 
 Symbol: SMW2
    Definitions
-      At line 111 in file main.s
+      At line 113 in file main.s
    Uses
       At line 107 in file main.s
 Comment: SMW2 used once
+SMW3 000000AA
+
+Symbol: SMW3
+   Definitions
+      At line 142 in file main.s
+   Uses
+      At line 135 in file main.s
+Comment: SMW3 used once
+SMW4 0000016A
+
+Symbol: SMW4
+   Definitions
+      At line 202 in file main.s
+   Uses
+      At line 196 in file main.s
+Comment: SMW4 used once
 __main 00000000
 
 Symbol: __main
@@ -1651,7 +1646,7 @@ Symbol: DAS
    Definitions
       At line 64 in file main.s
    Uses
-      At line 581 in file main.s
+      At line 578 in file main.s
 Comment: DAS used once
 DCDD 200002A0
 
@@ -1659,8 +1654,8 @@ Symbol: DCDD
    Definitions
       At line 61 in file main.s
    Uses
-      At line 344 in file main.s
-      At line 458 in file main.s
+      At line 341 in file main.s
+      At line 455 in file main.s
 
 DCT 200000AC
 
@@ -1668,8 +1663,8 @@ Symbol: DCT
    Definitions
       At line 60 in file main.s
    Uses
-      At line 283 in file main.s
-      At line 402 in file main.s
+      At line 280 in file main.s
+      At line 399 in file main.s
 
 DMS 20000498
 
@@ -1677,7 +1672,7 @@ Symbol: DMS
    Definitions
       At line 63 in file main.s
    Uses
-      At line 526 in file main.s
+      At line 523 in file main.s
 Comment: DMS used once
 EDMW1 20000060
 
@@ -1685,7 +1680,7 @@ Symbol: EDMW1
    Definitions
       At line 41 in file main.s
    Uses
-      At line 210 in file main.s
+      At line 203 in file main.s
 Comment: EDMW1 used once
 EDMW2 20000064
 
@@ -1693,7 +1688,7 @@ Symbol: EDMW2
    Definitions
       At line 42 in file main.s
    Uses
-      At line 213 in file main.s
+      At line 206 in file main.s
 Comment: EDMW2 used once
 EDMW3 20000068
 
@@ -1707,7 +1702,7 @@ Symbol: EDMW3
    Definitions
       At line 43 in file main.s
    Uses
-      At line 216 in file main.s
+      At line 209 in file main.s
 Comment: EDMW3 used once
 EDMW4 2000006C
 
@@ -1715,7 +1710,7 @@ Symbol: EDMW4
    Definitions
       At line 44 in file main.s
    Uses
-      At line 219 in file main.s
+      At line 212 in file main.s
 Comment: EDMW4 used once
 EDMW5 20000070
 
@@ -1723,7 +1718,7 @@ Symbol: EDMW5
    Definitions
       At line 45 in file main.s
    Uses
-      At line 222 in file main.s
+      At line 215 in file main.s
 Comment: EDMW5 used once
 EDMW6 20000074
 
@@ -1731,7 +1726,7 @@ Symbol: EDMW6
    Definitions
       At line 46 in file main.s
    Uses
-      At line 225 in file main.s
+      At line 218 in file main.s
 Comment: EDMW6 used once
 EDMW7 20000078
 
@@ -1739,7 +1734,7 @@ Symbol: EDMW7
    Definitions
       At line 47 in file main.s
    Uses
-      At line 228 in file main.s
+      At line 221 in file main.s
 Comment: EDMW7 used once
 EMC1 2000000C
 
@@ -1747,7 +1742,7 @@ Symbol: EMC1
    Definitions
       At line 20 in file main.s
    Uses
-      At line 121 in file main.s
+      At line 114 in file main.s
 Comment: EMC1 used once
 EMC2 20000010
 
@@ -1755,7 +1750,7 @@ Symbol: EMC2
    Definitions
       At line 21 in file main.s
    Uses
-      At line 124 in file main.s
+      At line 117 in file main.s
 Comment: EMC2 used once
 EMC3 20000014
 
@@ -1769,7 +1764,7 @@ Absolute symbols
 
       At line 22 in file main.s
    Uses
-      At line 127 in file main.s
+      At line 120 in file main.s
 Comment: EMC3 used once
 EMC4 20000018
 
@@ -1777,7 +1772,7 @@ Symbol: EMC4
    Definitions
       At line 23 in file main.s
    Uses
-      At line 130 in file main.s
+      At line 123 in file main.s
 Comment: EMC4 used once
 EMC5 2000001C
 
@@ -1785,7 +1780,7 @@ Symbol: EMC5
    Definitions
       At line 24 in file main.s
    Uses
-      At line 133 in file main.s
+      At line 126 in file main.s
 Comment: EMC5 used once
 EMC6 20000020
 
@@ -1793,7 +1788,7 @@ Symbol: EMC6
    Definitions
       At line 25 in file main.s
    Uses
-      At line 136 in file main.s
+      At line 129 in file main.s
 Comment: EMC6 used once
 FALSE 00000000
 
@@ -1810,13 +1805,13 @@ Symbol: G4BS
       At line 59 in file main.s
    Uses
       At line 102 in file main.s
-      At line 278 in file main.s
+      At line 275 in file main.s
+      At line 333 in file main.s
       At line 336 in file main.s
-      At line 339 in file main.s
-      At line 510 in file main.s
-      At line 521 in file main.s
-      At line 570 in file main.s
-      At line 580 in file main.s
+      At line 507 in file main.s
+      At line 518 in file main.s
+      At line 567 in file main.s
+      At line 577 in file main.s
 
 IPS1 20000044
 
@@ -1824,7 +1819,7 @@ Symbol: IPS1
    Definitions
       At line 34 in file main.s
    Uses
-      At line 178 in file main.s
+      At line 171 in file main.s
 Comment: IPS1 used once
 
 
@@ -1838,7 +1833,7 @@ Symbol: IPS2
    Definitions
       At line 35 in file main.s
    Uses
-      At line 181 in file main.s
+      At line 174 in file main.s
 Comment: IPS2 used once
 IPS3 2000004C
 
@@ -1846,7 +1841,7 @@ Symbol: IPS3
    Definitions
       At line 36 in file main.s
    Uses
-      At line 184 in file main.s
+      At line 177 in file main.s
 Comment: IPS3 used once
 IPS4 20000050
 
@@ -1854,7 +1849,7 @@ Symbol: IPS4
    Definitions
       At line 37 in file main.s
    Uses
-      At line 187 in file main.s
+      At line 180 in file main.s
 Comment: IPS4 used once
 IPS5 20000054
 
@@ -1862,7 +1857,7 @@ Symbol: IPS5
    Definitions
       At line 38 in file main.s
    Uses
-      At line 190 in file main.s
+      At line 183 in file main.s
 Comment: IPS5 used once
 IPS6 20000058
 
@@ -1870,7 +1865,7 @@ Symbol: IPS6
    Definitions
       At line 39 in file main.s
    Uses
-      At line 193 in file main.s
+      At line 186 in file main.s
 Comment: IPS6 used once
 P4BS 20000494
 
@@ -1878,8 +1873,8 @@ Symbol: P4BS
    Definitions
       At line 62 in file main.s
    Uses
-      At line 401 in file main.s
-      At line 457 in file main.s
+      At line 398 in file main.s
+      At line 454 in file main.s
 
 PTCP 2000005C
 
@@ -1887,7 +1882,7 @@ Symbol: PTCP
    Definitions
       At line 40 in file main.s
    Uses
-      At line 198 in file main.s
+      At line 191 in file main.s
 Comment: PTCP used once
 RXPIN 20000000
 
@@ -1909,7 +1904,7 @@ Symbol: TCP
    Definitions
       At line 33 in file main.s
    Uses
-      At line 173 in file main.s
+      At line 166 in file main.s
 Comment: TCP used once
 TCPS1 20000024
 
@@ -1917,7 +1912,7 @@ Symbol: TCPS1
    Definitions
       At line 26 in file main.s
    Uses
-      At line 150 in file main.s
+      At line 143 in file main.s
 Comment: TCPS1 used once
 TCPS2 20000028
 
@@ -1925,7 +1920,7 @@ Symbol: TCPS2
    Definitions
       At line 27 in file main.s
    Uses
-      At line 153 in file main.s
+      At line 146 in file main.s
 Comment: TCPS2 used once
 TCPS3 2000002C
 
@@ -1933,7 +1928,7 @@ Symbol: TCPS3
    Definitions
       At line 28 in file main.s
    Uses
-      At line 156 in file main.s
+      At line 149 in file main.s
 Comment: TCPS3 used once
 TCPS4 20000030
 
@@ -1941,7 +1936,7 @@ Symbol: TCPS4
    Definitions
       At line 29 in file main.s
    Uses
-      At line 159 in file main.s
+      At line 152 in file main.s
 Comment: TCPS4 used once
 TCPS5 20000034
 
@@ -1949,7 +1944,7 @@ Symbol: TCPS5
    Definitions
       At line 30 in file main.s
    Uses
-      At line 162 in file main.s
+      At line 155 in file main.s
 Comment: TCPS5 used once
 TCPS6 20000038
 
@@ -1963,7 +1958,7 @@ ARM Macro Assembler    Page 6 Alphabetic symbol ordering
 Absolute symbols
 
    Uses
-      At line 165 in file main.s
+      At line 158 in file main.s
 Comment: TCPS6 used once
 TCPS7 2000003C
 
@@ -1971,7 +1966,7 @@ Symbol: TCPS7
    Definitions
       At line 32 in file main.s
    Uses
-      At line 168 in file main.s
+      At line 161 in file main.s
 Comment: TCPS7 used once
 TRUE 00000001
 
@@ -1995,12 +1990,12 @@ Symbol: URL1
    Definitions
       At line 48 in file main.s
    Uses
-      At line 234 in file main.s
-      At line 293 in file main.s
-      At line 360 in file main.s
-      At line 415 in file main.s
-      At line 475 in file main.s
-      At line 535 in file main.s
+      At line 231 in file main.s
+      At line 290 in file main.s
+      At line 357 in file main.s
+      At line 412 in file main.s
+      At line 472 in file main.s
+      At line 532 in file main.s
 
 URL10 200000A0
 
@@ -2008,12 +2003,12 @@ Symbol: URL10
    Definitions
       At line 57 in file main.s
    Uses
-      At line 261 in file main.s
-      At line 320 in file main.s
-      At line 387 in file main.s
-      At line 442 in file main.s
-      At line 502 in file main.s
-      At line 562 in file main.s
+      At line 258 in file main.s
+      At line 317 in file main.s
+      At line 384 in file main.s
+      At line 439 in file main.s
+      At line 499 in file main.s
+      At line 559 in file main.s
 
 URL11 200000A4
 
@@ -2027,18 +2022,31 @@ Symbol: URL11
 ARM Macro Assembler    Page 7 Alphabetic symbol ordering
 Absolute symbols
 
-      At line 264 in file main.s
-      At line 323 in file main.s
-      At line 390 in file main.s
-      At line 445 in file main.s
-      At line 505 in file main.s
-      At line 565 in file main.s
+      At line 261 in file main.s
+      At line 320 in file main.s
+      At line 387 in file main.s
+      At line 442 in file main.s
+      At line 502 in file main.s
+      At line 562 in file main.s
 
 URL2 20000080
 
 Symbol: URL2
    Definitions
       At line 49 in file main.s
+   Uses
+      At line 234 in file main.s
+      At line 293 in file main.s
+      At line 360 in file main.s
+      At line 415 in file main.s
+      At line 475 in file main.s
+      At line 535 in file main.s
+
+URL3 20000084
+
+Symbol: URL3
+   Definitions
+      At line 50 in file main.s
    Uses
       At line 237 in file main.s
       At line 296 in file main.s
@@ -2047,11 +2055,11 @@ Symbol: URL2
       At line 478 in file main.s
       At line 538 in file main.s
 
-URL3 20000084
+URL4 20000088
 
-Symbol: URL3
+Symbol: URL4
    Definitions
-      At line 50 in file main.s
+      At line 51 in file main.s
    Uses
       At line 240 in file main.s
       At line 299 in file main.s
@@ -2060,11 +2068,11 @@ Symbol: URL3
       At line 481 in file main.s
       At line 541 in file main.s
 
-URL4 20000088
+URL5 2000008C
 
-Symbol: URL4
+Symbol: URL5
    Definitions
-      At line 51 in file main.s
+      At line 52 in file main.s
    Uses
       At line 243 in file main.s
       At line 302 in file main.s
@@ -2072,19 +2080,6 @@ Symbol: URL4
       At line 424 in file main.s
       At line 484 in file main.s
       At line 544 in file main.s
-
-URL5 2000008C
-
-Symbol: URL5
-   Definitions
-      At line 52 in file main.s
-   Uses
-      At line 246 in file main.s
-      At line 305 in file main.s
-      At line 372 in file main.s
-      At line 427 in file main.s
-      At line 487 in file main.s
-      At line 547 in file main.s
 
 
 
@@ -2098,6 +2093,19 @@ Symbol: URL6
    Definitions
       At line 53 in file main.s
    Uses
+      At line 246 in file main.s
+      At line 305 in file main.s
+      At line 372 in file main.s
+      At line 427 in file main.s
+      At line 487 in file main.s
+      At line 547 in file main.s
+
+URL7 20000094
+
+Symbol: URL7
+   Definitions
+      At line 54 in file main.s
+   Uses
       At line 249 in file main.s
       At line 308 in file main.s
       At line 375 in file main.s
@@ -2105,11 +2113,11 @@ Symbol: URL6
       At line 490 in file main.s
       At line 550 in file main.s
 
-URL7 20000094
+URL8 20000098
 
-Symbol: URL7
+Symbol: URL8
    Definitions
-      At line 54 in file main.s
+      At line 55 in file main.s
    Uses
       At line 252 in file main.s
       At line 311 in file main.s
@@ -2118,11 +2126,11 @@ Symbol: URL7
       At line 493 in file main.s
       At line 553 in file main.s
 
-URL8 20000098
+URL9 2000009C
 
-Symbol: URL8
+Symbol: URL9
    Definitions
-      At line 55 in file main.s
+      At line 56 in file main.s
    Uses
       At line 255 in file main.s
       At line 314 in file main.s
@@ -2130,19 +2138,6 @@ Symbol: URL8
       At line 436 in file main.s
       At line 496 in file main.s
       At line 556 in file main.s
-
-URL9 2000009C
-
-Symbol: URL9
-   Definitions
-      At line 56 in file main.s
-   Uses
-      At line 258 in file main.s
-      At line 317 in file main.s
-      At line 384 in file main.s
-      At line 439 in file main.s
-      At line 499 in file main.s
-      At line 559 in file main.s
 
 50 symbols
 429 symbols in table
