@@ -1,66 +1,66 @@
-; Se asignan etiquetas para las constantes de 0 y 1 que se usaran para mostrar el valor de los outputs que irán a las alarmas
+; Se asignan etiquetas para las constantes de 0 y 1 que se usaran para mostrar el valor de los outputs que irï¿½n a las alarmas
 
 TRUE		EQU		1
 FALSE		EQU		0
 	
 ; Se renombran los registros que se van a utilizar como variables
-CT			RN		R0 ; CT: Cámara Térmica 
-CD			RN		R1 ; CD: Cámara de Distancia	
+CT			RN		R0 ; CT: Cï¿½mara Tï¿½rmica 
+CD			RN		R1 ; CD: Cï¿½mara de Distancia	
 AS			RN		R2 ; AS: Alarmas provenientes del Server
-MS			RN		R3 ; MS: Mensaje del Server que se imprimirá en el LCD
+MS			RN		R3 ; MS: Mensaje del Server que se imprimirï¿½ en el LCD
 
 	
-; Se asignan etiquetas para los espacios de memoria RAM donde se almacenarán los ouputs del sistema
-; La memoria RAM comienza en la dirección 0x20000000
-; Cada dirección de memoria apunta a un bloque de 4 bytes de tamaño
+; Se asignan etiquetas para los espacios de memoria RAM donde se almacenarï¿½n los ouputs del sistema
+; La memoria RAM comienza en la direcciï¿½n 0x20000000
+; Cada direcciï¿½n de memoria apunta a un bloque de 4 bytes de tamaï¿½o
 ; Notaciones: S = Salida, SE = Server, LCD = LCD
 
 RXPIN		EQU		0x20000000  ; Etiqueta del espacio de memoria donde se asigna el pin RX del ESP8266
 TXPIN		EQU		0x20000004  ; Etiqueta del espacio de memoria donde se asigna el pin TX del ESP8266
 BRS			EQU		0X20000008	; Etiqueta del espacio de memoria donde se asigna el Baud Rate Serial
-EMC1		EQU		0x2000000C  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Módulo Wifi Parte 1
-EMC2		EQU		0x20000010  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Módulo Wifi Parte 2
-EMC3		EQU		0x20000014  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Módulo Wifi Parte 3
-EMC4		EQU		0x20000018  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Módulo Wifi Parte 4
-EMC5		EQU		0x2000001C  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Módulo Wifi Parte 5
-EMC6		EQU		0x20000020  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Módulo Wifi Parte 6
-TCPS1		EQU		0x20000024  ; Etiqueta del espacio de memoria para el TCP Start del Módulo Wifi Parte 1
-TCPS2		EQU		0x20000028  ; Etiqueta del espacio de memoria para el TCP Start del Módulo Wifi Parte 2
-TCPS3		EQU		0x2000002C  ; Etiqueta del espacio de memoria para el TCP Start del Módulo Wifi Parte 3
-TCPS4		EQU		0x20000030  ; Etiqueta del espacio de memoria para el TCP Start del Módulo Wifi Parte 4
-TCPS5		EQU		0x20000034  ; Etiqueta del espacio de memoria para el TCP Start del Módulo Wifi Parte 5
-TCPS6		EQU		0x20000038  ; Etiqueta del espacio de memoria para el TCP Start del Módulo Wifi Parte 6
-TCPS7		EQU		0x2000003C  ; Etiqueta del espacio de memoria para el TCP Start del Módulo Wifi Parte 7	
-TCP			EQU		0x20000040  ; Etiqueta del espacio de memoria para el valor de activación de TCP	
+EMC1		EQU		0x2000000C  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Mï¿½dulo Wifi Parte 1
+EMC2		EQU		0x20000010  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Mï¿½dulo Wifi Parte 2
+EMC3		EQU		0x20000014  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Mï¿½dulo Wifi Parte 3
+EMC4		EQU		0x20000018  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Mï¿½dulo Wifi Parte 4
+EMC5		EQU		0x2000001C  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Mï¿½dulo Wifi Parte 5
+EMC6		EQU		0x20000020  ; Etiqueta del espacio de memoria para el Enable Multiple Connections TCP del Mï¿½dulo Wifi Parte 6
+TCPS1		EQU		0x20000024  ; Etiqueta del espacio de memoria para el TCP Start del Mï¿½dulo Wifi Parte 1
+TCPS2		EQU		0x20000028  ; Etiqueta del espacio de memoria para el TCP Start del Mï¿½dulo Wifi Parte 2
+TCPS3		EQU		0x2000002C  ; Etiqueta del espacio de memoria para el TCP Start del Mï¿½dulo Wifi Parte 3
+TCPS4		EQU		0x20000030  ; Etiqueta del espacio de memoria para el TCP Start del Mï¿½dulo Wifi Parte 4
+TCPS5		EQU		0x20000034  ; Etiqueta del espacio de memoria para el TCP Start del Mï¿½dulo Wifi Parte 5
+TCPS6		EQU		0x20000038  ; Etiqueta del espacio de memoria para el TCP Start del Mï¿½dulo Wifi Parte 6
+TCPS7		EQU		0x2000003C  ; Etiqueta del espacio de memoria para el TCP Start del Mï¿½dulo Wifi Parte 7	
+TCP			EQU		0x20000040  ; Etiqueta del espacio de memoria para el valor de activaciï¿½n de TCP	
 IPS1		EQU		0x20000044  ; Etiqueta del espacio de memoria para la IP del Server Parte 1
 IPS2		EQU		0x20000048  ; Etiqueta del espacio de memoria para la IP del Server Parte 2	
 IPS3		EQU		0x2000004C  ; Etiqueta del espacio de memoria para la IP del Server Parte 3	
 IPS4		EQU		0x20000050  ; Etiqueta del espacio de memoria para la IP del Server Parte 4
 IPS5		EQU		0x20000054  ; Etiqueta del espacio de memoria para la IP del Server Parte 5
 IPS6		EQU		0x20000058  ; Etiqueta del espacio de memoria para la IP del Server Parte 6	
-PTCP		EQU		0x2000005C	; Etiqueta del espacio de memoria para el puerto TCP de comunicación con el módulo de Wifi	
-EDMW1		EQU		0x20000060  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Módulo de Wifi Parte 1
-EDMW2		EQU		0x20000064  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Módulo de Wifi Parte 2
-EDMW3		EQU		0x20000068  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Módulo de Wifi Parte 3
-EDMW4		EQU		0x2000006C  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Módulo de Wifi Parte 4
-EDMW5		EQU		0x20000070  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Módulo de Wifi Parte 5
-EDMW6		EQU		0x20000074  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Módulo de Wifi Parte 6
-EDMW7		EQU		0x20000078  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Módulo de Wifi Parte 7
-URL1		EQU		0x2000007C  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 1
-URL2		EQU		0x20000080  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 2
-URL3		EQU		0x20000084  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 3
-URL4		EQU		0x20000088  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 4
-URL5		EQU		0x2000008C  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 5
-URL6		EQU		0x20000090  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 6
-URL7		EQU		0x20000094  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 7
-URL8		EQU		0x20000098  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 8
-URL9		EQU		0x2000009C  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 9
-URL10		EQU		0x200000A0  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 10
-URL11		EQU		0x200000A4  ; Etiqueta del espacio de memoria para la URL de comunicación Parte 11
-G4BS		EQU		0x200000A8	; Etiqueta del espacio de memoria que representa el GET de 4 Bytes que se obtienen a través de la comunicación serial
-DCT			EQU		0x200000AC  ; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cámara térmica
-DCDD		EQU		0x200002A0	; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cámara de distancia
-P4BS		EQU		0x20000494	; Etiqueta del espacio de memoria que representa el POST de 4 Bytes que se mandan a través de la comunicación serial
+PTCP		EQU		0x2000005C	; Etiqueta del espacio de memoria para el puerto TCP de comunicaciï¿½n con el mï¿½dulo de Wifi	
+EDMW1		EQU		0x20000060  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Mï¿½dulo de Wifi Parte 1
+EDMW2		EQU		0x20000064  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Mï¿½dulo de Wifi Parte 2
+EDMW3		EQU		0x20000068  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Mï¿½dulo de Wifi Parte 3
+EDMW4		EQU		0x2000006C  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Mï¿½dulo de Wifi Parte 4
+EDMW5		EQU		0x20000070  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Mï¿½dulo de Wifi Parte 5
+EDMW6		EQU		0x20000074  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Mï¿½dulo de Wifi Parte 6
+EDMW7		EQU		0x20000078  ; Etiqueta del espacio de memoria para el comando de Enviar Datos por medio del Mï¿½dulo de Wifi Parte 7
+URL1		EQU		0x2000007C  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 1
+URL2		EQU		0x20000080  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 2
+URL3		EQU		0x20000084  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 3
+URL4		EQU		0x20000088  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 4
+URL5		EQU		0x2000008C  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 5
+URL6		EQU		0x20000090  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 6
+URL7		EQU		0x20000094  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 7
+URL8		EQU		0x20000098  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 8
+URL9		EQU		0x2000009C  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 9
+URL10		EQU		0x200000A0  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 10
+URL11		EQU		0x200000A4  ; Etiqueta del espacio de memoria para la URL de comunicaciï¿½n Parte 11
+G4BS		EQU		0x200000A8	; Etiqueta del espacio de memoria que representa el GET de 4 Bytes que se obtienen a travï¿½s de la comunicaciï¿½n serial
+DCT			EQU		0x200000AC  ; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cï¿½mara tï¿½rmica
+DCDD		EQU		0x200002A0	; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos de la cï¿½mara de distancia
+P4BS		EQU		0x20000494	; Etiqueta del espacio de memoria que representa el POST de 4 Bytes que se mandan a travï¿½s de la comunicaciï¿½n serial
 DMS			EQU		0x20000498  ; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos del mensaje obtenido por el server
 DAS			EQU		0x200004C4	; Etiqueta del espacio de memoria donde se almacena el activador de las alarmas de acuerdo a lo que diga el server 
 SB1			EQU		0x200004C8	; Se asigna la etiqueta salida de bocina al espacio de memoria
@@ -112,7 +112,7 @@ LCDDI9		EQU		616E6365	;corresponde a la parte 9 del mensaje  "distancia ilegal" 
 
 
 
-; Código del programa principal
+; Cï¿½digo del programa principal
 
 		AREA Main, CODE, READONLY
 		ENTRY
@@ -120,10 +120,10 @@ LCDDI9		EQU		616E6365	;corresponde a la parte 9 del mensaje  "distancia ilegal" 
 		
 __main
 
-; Conjunto de Branches que representan el esqueleto del código
+; Conjunto de Branches que representan el esqueleto del cï¿½digo
 		
-		BL		SMW	  ; Branch de la subrutina SMW = Setup del Módulo de Wifi
-INF		BL		GDC   ; Branch de la subrutina GDC = Get de los Datos de las Cámaras
+		BL		SMW	  ; Branch de la subrutina SMW = Setup del Mï¿½dulo de Wifi
+INF		BL		GDC   ; Branch de la subrutina GDC = Get de los Datos de las Cï¿½maras
 		BL		PDS   ; Branch de la subrutina PDS = Post de los Datos al Server
 		BL		GMA   ; Branch de la subrutina GMA = Get del Mensaje y de la Alarma
 		BL 		SDE	  ; Branch de la subrutina SDE = Subrutina de Envio
@@ -131,9 +131,9 @@ INF		BL		GDC   ; Branch de la subrutina GDC = Get de los Datos de las Cámaras
 		
 		
 ; Paso #0
-; Subrutina que se encarga de hacer el setup de los pines y las condiciones requeridas por el módulo de Wifi ESP8266
+; Subrutina que se encarga de hacer el setup de los pines y las condiciones requeridas por el mï¿½dulo de Wifi ESP8266
 
-		;Se establecen los pines en que va a funcionar el módulo
+		;Se establecen los pines en que va a funcionar el mï¿½dulo
 SMW		MOV R6,#2
 		MOV R7,#3
 		LDR R8,=RXPIN ; RX se establce en el pin 2
@@ -141,25 +141,25 @@ SMW		MOV R6,#2
 		LDR R8,=TXPIN ; TX se establece en el pin 3 
 		STR R7,[R8]
 		
-		; Se establece el Baudrate de la comunicación serial 
+		; Se establece el Baudrate de la comunicaciï¿½n serial 
 		MOV R6,#9600
-		LDR R7,=BRS ; Se inicializa la velocidad de comunicación serial en 9600
+		LDR R7,=BRS ; Se inicializa la velocidad de comunicaciï¿½n serial en 9600
 		LTORG
 		STR R6,[R7]
 		
-		; Se alamcena un valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema
+		; Se alamcena un valor simbï¿½lico en el espacio de memoria donde se obtendrï¿½an los 4 bytes al hacer un GET al Server del sistema
 		MOV R7,0x0000FFFF
 		LDR R8,=G4BS
 		STR R7,[R8]
 		
-		; Se hace un delay de 2 milisegundos (En este caso se esperan 2 tiempos simbólicos)
+		; Se hace un delay de 2 milisegundos (En este caso se esperan 2 tiempos simbï¿½licos)
 		MOV R6,#2
-DL2		CBZ	R6,SMW2  ; Básicamente lo saca del loop cuando R6(contador del delay en este caso) sea cero
+DL2		CBZ	R6,SMW2  ; Bï¿½sicamente lo saca del loop cuando R6(contador del delay en este caso) sea cero
 		SUB R6,R6,#1
 		B	DL2      ; Ciclo DL2 = Delay de 2 tiempos
 				
 		
-		; Establecer conexiones múltiples TCP en el módulo  Wifi, con el comando AT: AT+CIPMUX=1 = 0x41542B4349504D55583D31
+		; Establecer conexiones mï¿½ltiples TCP en el mï¿½dulo  Wifi, con el comando AT: AT+CIPMUX=1 = 0x41542B4349504D55583D31
 SMW2 	MOV R7, 0x4154
 		LDR R8,=EMC1
 		STR R7,[R8]
@@ -180,13 +180,13 @@ SMW2 	MOV R7, 0x4154
 		STR R7,[R8]
 		
 		
-		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbï¿½lico)
 		MOV R7,#1
-DL1		CBZ	R7,SMW3  ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL1		CBZ	R7,SMW3  ; Bï¿½sicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL1      ; Ciclo DL1 = Primer Delay de 1 tiempo
 		
-		; Se establece una conexión TCP cliente al servidor del sistema, dando como párametros el IP del Server y el puerto de comunicación
+		; Se establece una conexiï¿½n TCP cliente al servidor del sistema, dando como pï¿½rametros el IP del Server y el puerto de comunicaciï¿½n
 		; Se utiliza el comando AT+CIPSTART=4 = 0x41542b43495053544152543d34 
 SMW3   	MOV R7, 0x4154
 		LDR R8,=TCPS1
@@ -210,7 +210,7 @@ SMW3   	MOV R7, 0x4154
 		LDR R8,=TCPS7
 		STR R7,[R8]
 		
-		; Se establece el valor de TCP en 1 para indicar el tipo de conexión
+		; Se establece el valor de TCP en 1 para indicar el tipo de conexiï¿½n
 		MOV R7, #1
 		LDR R8,=TCP
 		STR R7,[R8]
@@ -235,18 +235,18 @@ SMW3   	MOV R7, 0x4154
 		LDR R8,=IPS6
 		STR R7,[R8]
 		
-		; Se define el puerto de comunicación EN 8080
+		; Se define el puerto de comunicaciï¿½n EN 8080
 		MOV R7, #8080
 		LDR R8,=PTCP
 		STR R7,[R8]
 		
-		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbï¿½lico)
 		MOV R7,#1
-DL12	CBZ	R7,SMW4  ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL12	CBZ	R7,SMW4  ; Bï¿½sicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL12     ; Ciclo DL12 = Segundo Delay de 1 tiempo
 		
-		; Establecer el comando AT para poder enviar datos através del módulo de wifi
+		; Establecer el comando AT para poder enviar datos atravï¿½s del mï¿½dulo de wifi
 		; En este caso se utiliza el comando AT+CIPSEND=4 : 0x41542b43495053454e443d340a
 SMW4	MOV R7, 0x4154
 		LDR R8,=EDMW1
@@ -272,9 +272,9 @@ SMW4	MOV R7, 0x4154
 		BX	LR  ; Se regresa al flujo principal del programa
 		
 ; Paso #1		
-; Subrutina que se encarga de hacer el request GET de los datos de la cámara térmica y de la cámara de distancia
+; Subrutina que se encarga de hacer el request GET de los datos de la cï¿½mara tï¿½rmica y de la cï¿½mara de distancia
 		
-		; Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos de la cámara térmica
+		; Establecer la URL de Envï¿½o, que en este caso corresponde con la Operaciï¿½n GET, para obtener los datos de la cï¿½mara tï¿½rmica
 		; GET/CT.html HTTP/1.1 = 0x4745542f43542e68746d6c20485454502f312e31
 GDC		MOV R7, 0x4745
 		LDR R8,=URL1
@@ -311,29 +311,29 @@ GDC		MOV R7, 0x4745
 		STR	R7,[R8]
 		
 		
-		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbï¿½lico)
 		MOV R7,#1
-DL13	CBZ	R7,GDC2  ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL13	CBZ	R7,GDC2  ; Bï¿½sicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL13     ; Ciclo DL13 = Tercer Delay de 1 tiempo
 		
 		
 		
-		; Ciclo que realiza el GET de los datos de la cámara térmica
+		; Ciclo que realiza el GET de los datos de la cï¿½mara tï¿½rmica
 GDC2	MOV R6,#0     ; Se establece el contador en 0
-		LDR R7,=G4BS  ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
+		LDR R7,=G4BS  ; Se carga en R7 la direcciï¿½n de memoria donde se obtienen los datos del GET
 GDC3	CMP R6,#500   ; El valor real es 153600, para efectos de prueba se deja en 500
 		BEQ	GDC4
-		LDRNE CT,[R7] ; Se almacena el contenido de la dirección guardada en R7 en el registro de la cámara térmica
-		LDRNE R8,=DCT ; Se almacena en R8 la dirección de memoria donde se almacenan los datos de la cámara térmica
+		LDRNE CT,[R7] ; Se almacena el contenido de la direcciï¿½n guardada en R7 en el registro de la cï¿½mara tï¿½rmica
+		LDRNE R8,=DCT ; Se almacena en R8 la direcciï¿½n de memoria donde se almacenan los datos de la cï¿½mara tï¿½rmica
 		
-		; Para guardar los datos de la cámara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
-		STRNE CT,[R8,R6] ; Se guarda lo que hay en el registro de la cámara térmica en la dirección de memoria correspondiente
-		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
+		; Para guardar los datos de la cï¿½mara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
+		STRNE CT,[R8,R6] ; Se guarda lo que hay en el registro de la cï¿½mara tï¿½rmica en la direcciï¿½n de memoria correspondiente
+		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaï¿½o de los bloques de memoria (4 bytes)
 		BNE GDC3
 	
 	
-		; Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos de la cámara de distancia
+		; Establecer la URL de Envï¿½o, que en este caso corresponde con la Operaciï¿½n GET, para obtener los datos de la cï¿½mara de distancia
 		; GET/CD.html HTTP/1.1 = 0x4745542f43442e68746d6c20485454502f312e31
 GDC4	MOV R7, 0x4745
 		LDR R8,=URL1
@@ -369,28 +369,28 @@ GDC4	MOV R7, 0x4745
 		LDR	R8,=URL11
 		STR	R7,[R8]
 		
-		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbï¿½lico)
 		MOV R7,#1
-DL14	CBZ	R7,GDC5  ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL14	CBZ	R7,GDC5  ; Bï¿½sicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL14     ; Ciclo DL14 = Cuarto Delay de 1 tiempo
 		
 		
-		; Ciclo que realiza el GET de los datos de la cámara de distancia
-		; Se almacena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema. Esto para revisar en memoria y simular el envío de datos distintos
+		; Ciclo que realiza el GET de los datos de la cï¿½mara de distancia
+		; Se almacena otro valor simbï¿½lico en el espacio de memoria donde se obtendrï¿½an los 4 bytes al hacer un GET al Server del sistema. Esto para revisar en memoria y simular el envï¿½o de datos distintos
 GDC5	MOV R7,0x0000DDDD
 		LDR R8,=G4BS
 		STR R7,[R8]
 		MOV R6,#0    ; Se establece el contador en 0
-		LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
+		LDR R7,=G4BS ; Se carga en R7 la direcciï¿½n de memoria donde se obtienen los datos del GET
 GDC6	CMP R6,#500  ; El valor real es 4147200, para efectos de prueba se deja en 500
 		BEQ	GDC7
-		LDRNE CD,[R7]  ; Se almacena el contenido de la dirección guardada en R7 en el registro de la cámara de distancia
-		LDRNE R8,=DCDD ; Se almacena en R8 la dirección de memoria donde se almacenan los datos de la cámara de distancia
+		LDRNE CD,[R7]  ; Se almacena el contenido de la direcciï¿½n guardada en R7 en el registro de la cï¿½mara de distancia
+		LDRNE R8,=DCDD ; Se almacena en R8 la direcciï¿½n de memoria donde se almacenan los datos de la cï¿½mara de distancia
 		
-		; Para guardar los datos de la cámara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
-		STRNE CD,[R8,R6] ; Se guarda lo que hay en el registro de la cámara de distancia en la dirección de memoria correspondiente
-		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
+		; Para guardar los datos de la cï¿½mara se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
+		STRNE CD,[R8,R6] ; Se guarda lo que hay en el registro de la cï¿½mara de distancia en la direcciï¿½n de memoria correspondiente
+		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaï¿½o de los bloques de memoria (4 bytes)
 		BNE GDC6
 		
 GDC7	BX	LR  ; Se regresa al flujo principal del programa
@@ -398,9 +398,9 @@ GDC7	BX	LR  ; Se regresa al flujo principal del programa
 
 
 ; Paso #2
-; Subrutina que se encarga de hacer el request POST de los datos obtenidos de las cámaras al Server del sistema
+; Subrutina que se encarga de hacer el request POST de los datos obtenidos de las cï¿½maras al Server del sistema
 
-		; Establecer la URL de Envío, que en este caso corresponde con la Operación POST, para mandar los datos de la cámara térmica
+		; Establecer la URL de Envï¿½o, que en este caso corresponde con la Operaciï¿½n POST, para mandar los datos de la cï¿½mara tï¿½rmica
 		; POST/CT.html HTTP/1.1 = 0x504f53542f43542e68746d6c20485454502f312e31
 PDS		MOV R7, 0x504F
 		LDR R8,=URL1
@@ -436,24 +436,24 @@ PDS		MOV R7, 0x504F
 		LDR	R8,=URL11
 		STR	R7,[R8]
 		
-		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbï¿½lico)
 		MOV R7,#1
-DL15	CBZ	R7,PDS2 ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL15	CBZ	R7,PDS2 ; Bï¿½sicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL15    ; Ciclo DL15 = Quinto Delay de 1 tiempo
 		
-		; Ciclo que realiza el POST de los datos de la cámara térmica
+		; Ciclo que realiza el POST de los datos de la cï¿½mara tï¿½rmica
 PDS2	MOV R6,#0    ; Se establece el contador en 0
-		LDR R7,=P4BS ; Se carga en R7 la dirección de memoria donde se guardan los datos que serán enviados mediante la instrucción POST
-		LDR R8,=DCT  ; Se carga en R8 la dirección de memoria donde comienzan los datos de la cámara térmica
+		LDR R7,=P4BS ; Se carga en R7 la direcciï¿½n de memoria donde se guardan los datos que serï¿½n enviados mediante la instrucciï¿½n POST
+		LDR R8,=DCT  ; Se carga en R8 la direcciï¿½n de memoria donde comienzan los datos de la cï¿½mara tï¿½rmica
 PDS3	CMP R6,#500  ; El valor real es 153600, para efectos de prueba se deja en 500
 		BEQ	PDS4
 		LDRNE CT,[R8,R6]
 		STRNE CT,[R7]
-		ADDNE R6,R6,#4  ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
+		ADDNE R6,R6,#4  ; Se incrementa el contador en 4, que es el tamaï¿½o de los bloques de memoria (4 bytes)
 		BNE PDS3
 		
-		; Establecer la URL de Envío, que en este caso corresponde con la Operación POST, para mandar los datos de la cámara de distancia
+		; Establecer la URL de Envï¿½o, que en este caso corresponde con la Operaciï¿½n POST, para mandar los datos de la cï¿½mara de distancia
 		; POST/CD.html HTTP/1.1 = 0x504f53542f43442e68746d6c20485454502f312e31
 PDS4	MOV R7, 0x504F
 		LDR R8,=URL1
@@ -489,30 +489,30 @@ PDS4	MOV R7, 0x504F
 		LDR	R8,=URL11
 		STR	R7,[R8]
 		
-		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbï¿½lico)
 		MOV R7,#1
-DL16	CBZ	R7,PDS5 ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL16	CBZ	R7,PDS5 ; Bï¿½sicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL16    ; Ciclo DL16 = Sexto Delay de 1 tiempo
 
 		
-		; Ciclo que realiza el POST de los datos de la cámara de distancia
+		; Ciclo que realiza el POST de los datos de la cï¿½mara de distancia
 PDS5	MOV R6,#0    ; Se establece el contador en 0
-		LDR R7,=P4BS ; Se carga en R7 la dirección de memoria donde se guardan los datos que serán enviados mediante la instrucción POST
-		LDR R8,=DCDD ; Se carga en R8 la dirección de memoria donde comienzan los datos de la cámara de distancia
+		LDR R7,=P4BS ; Se carga en R7 la direcciï¿½n de memoria donde se guardan los datos que serï¿½n enviados mediante la instrucciï¿½n POST
+		LDR R8,=DCDD ; Se carga en R8 la direcciï¿½n de memoria donde comienzan los datos de la cï¿½mara de distancia
 PDS6	CMP R6,#500  ; El valor real es 4147200, para efectos de prueba se deja en 500
 		BEQ	PDS7
 		LDRNE CD,[R8,R6]
 		STRNE CD,[R7]
-		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
+		ADDNE R6,R6,#4 ; Se incrementa el contador en 4, que es el tamaï¿½o de los bloques de memoria (4 bytes)
 		BNE PDS6
 		
 PDS7	BX	LR	; Se regresa al flujo principal del programa
 
 ; Paso #3
-; Subrutina que se encarga de hacer el request GET al Server del Mensaje de que se proyectará en el LCD y del código de activación de las alarmas
+; Subrutina que se encarga de hacer el request GET al Server del Mensaje de que se proyectarï¿½ en el LCD y del cï¿½digo de activaciï¿½n de las alarmas
 
-		; Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para obtener los datos del mensaje del server
+		; Establecer la URL de Envï¿½o, que en este caso corresponde con la Operaciï¿½n GET, para obtener los datos del mensaje del server
 		; GET/MS.html HTTP/1.1 = 0x4745542f4d532e68746d6c20485454502f312e31
 GMA		MOV R7, 0x4745
 		LDR R8,=URL1
@@ -548,31 +548,31 @@ GMA		MOV R7, 0x4745
 		LDR	R8,=URL11
 		STR	R7,[R8]
 		
-		; Se alamcena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
+		; Se alamcena otro valor simbï¿½lico en el espacio de memoria donde se obtendrï¿½an los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
 		MOV R7,0x0000AAAA
 		LDR R8,=G4BS
 		STR R7,[R8]
 		
-		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbï¿½lico)
 		MOV R7,#1
-DL17	CBZ	R7,GMA2 ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL17	CBZ	R7,GMA2 ; Bï¿½sicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
-		B	DL17    ; Ciclo DL17 = Séptimo Delay de 1 tiempo
+		B	DL17    ; Ciclo DL17 = Sï¿½ptimo Delay de 1 tiempo
 		
 		; Ciclo que realiza el GET de los datos del mensaje del server
 GMA2	MOV R6,#0    ; Se establece el contador en 0
-		LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
+		LDR R7,=G4BS ; Se carga en R7 la direcciï¿½n de memoria donde se obtienen los datos del GET
 GMA3	CMP R6,#44   ; Se deben llenar 11 bloques de memoria con 4 bytes cada uno, para obtener el mensaje completo del server 
 		BEQ	GMA4
-		LDRNE MS,[R7] ; Se almacena el contenido de la dirección guardada en R7 en el registro del mensaje del server
-		LDRNE R8,=DMS ; Se almacena en R8 la dirección de memoria donde se almacenan los datos del mensaje del server
+		LDRNE MS,[R7] ; Se almacena el contenido de la direcciï¿½n guardada en R7 en el registro del mensaje del server
+		LDRNE R8,=DMS ; Se almacena en R8 la direcciï¿½n de memoria donde se almacenan los datos del mensaje del server
 		
 		; Para guardar el mensaje del server se usa como base el valor inicial de R8 y se le suma el offset correspondiente al valor actual del contador
-		STRNE MS,[R8,R6] ; Se guarda lo que hay en el registro del mensaje del server en la dirección de memoria correspondiente
-		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaño de los bloques de memoria (4 bytes)
+		STRNE MS,[R8,R6] ; Se guarda lo que hay en el registro del mensaje del server en la direcciï¿½n de memoria correspondiente
+		ADDNE R6,R6,#4   ; Se incrementa el contador en 4, que es el tamaï¿½o de los bloques de memoria (4 bytes)
 		BNE GMA3
 		
-		; Establecer la URL de Envío, que en este caso corresponde con la Operación GET, para el valor de las alarmas enviado por el server
+		; Establecer la URL de Envï¿½o, que en este caso corresponde con la Operaciï¿½n GET, para el valor de las alarmas enviado por el server
 		; GET/AS.html HTTP/1.1 = 0x4745542f41532e68746d6c20485454502f312e31
 GMA4	MOV R7, 0x4745
 		LDR R8,=URL1
@@ -608,20 +608,20 @@ GMA4	MOV R7, 0x4745
 		LDR	R8,=URL11
 		STR	R7,[R8]
 		
-		; Se alamcena otro valor simbólico en el espacio de memoria donde se obtendrían los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
+		; Se alamcena otro valor simbï¿½lico en el espacio de memoria donde se obtendrï¿½an los 4 bytes al hacer un GET al Server del sistema, para efectos de pruebas
 		MOV R7,0x0000EAEA
 		LDR R8,=G4BS
 		STR R7,[R8]
 		
-		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbólico)
+		; Se hace un delay de 1 milisegundo (En este caso se espera 1 tiempo simbï¿½lico)
 		MOV R7,#1
-DL18	CBZ	R7,GMA5 ; Básicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
+DL18	CBZ	R7,GMA5 ; Bï¿½sicamente lo saca del loop cuando R7(contador del delay en este caso) sea cero
 		SUB R7,R7,#1
 		B	DL18    ; Ciclo DL18 = Octavo Delay de 1 tiempo
 		
 		; Subrutina que se encarga de almacenar en memoria el valor obtenido al hacer el GET al Server del activador de las alarmas
-GMA5	LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los datos del GET
-		LDR	R8,=DAS	 ; Se almacena en R8 la dirección de memoria donde se almacenan los datos del activador de las alarmas
+GMA5	LDR R7,=G4BS ; Se carga en R7 la direcciï¿½n de memoria donde se obtienen los datos del GET
+		LDR	R8,=DAS	 ; Se almacena en R8 la direcciï¿½n de memoria donde se almacenan los datos del activador de las alarmas
 		LDR	AS,[R7]
 		STR	AS,[R8]
 		BX	LR ; Se regresa al flujo principal del programa
@@ -655,7 +655,7 @@ SDE3	BX	LR ; Se retorna al flujo principal
 			
 			
 ; Paso #5
-; Subrutina que se encarga de mandar al LCD el mensaje obtenido através del servidor y de activar o no las alarmas dependiendo de lo obtenido por el Server		
+; Subrutina que se encarga de mandar al LCD el mensaje obtenido atravï¿½s del servidor y de activar o no las alarmas dependiendo de lo obtenido por el Server		
 		
  	
 EMA		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
