@@ -13,6 +13,7 @@ MS			RN		R3 ; MS: Mensaje del Server que se imprimirá en el LCD
 ; Se asignan etiquetas para los espacios de memoria RAM donde se almacenarán los ouputs del sistema
 ; La memoria RAM comienza en la dirección 0x20000000
 ; Cada dirección de memoria apunta a un bloque de 4 bytes de tamaño
+; Notaciones: S = Salida, SE = Server, LCD = LCD
 
 RXPIN		EQU		0x20000000  ; Etiqueta del espacio de memoria donde se asigna el pin RX del ESP8266
 TXPIN		EQU		0x20000004  ; Etiqueta del espacio de memoria donde se asigna el pin TX del ESP8266
@@ -62,6 +63,53 @@ DCDD		EQU		0x200002A0	; Etiqueta del espacio de memoria que indica el inicio don
 P4BS		EQU		0x20000494	; Etiqueta del espacio de memoria que representa el POST de 4 Bytes que se mandan a través de la comunicación serial
 DMS			EQU		0x20000498  ; Etiqueta del espacio de memoria que indica el inicio donde se almacenan los datos del mensaje obtenido por el server
 DAS			EQU		0x200004C4	; Etiqueta del espacio de memoria donde se almacena el activador de las alarmas de acuerdo a lo que diga el server 
+SB1			EQU		0x200004C8	; Se asigna la etiqueta salida de bocina al espacio de memoria
+SL1			EQU		0x200004CC	; Se asigna la etiqueta salida de LED al espacio de memoria
+SBOC		EQU 	0x200004D0	; Se asigna la etiqueta salida de BOZZER al espacio de memoria
+SLCD		EQU		0x200004D4	; Se asigna la etiqueta salida del LCD al espacio de memoria
+	
+; Definicion de Pines para la coneccion con el LCD
+P04		   	EQU		0	; Corresponde al pin que se conecta al pin RS del LCD 
+P05			EQU		0	; Corresponde al pin que se conecta al pin RW del LCD 
+P06			EQU		0	; Corresponde al pin que se conecta al pin E del LCD 
+P012		EQU		0	; Corresponde al pin que se conecta al pin D4 del LCD 
+P013		EQU		0	; Corresponde al pin que se conecta al pin D5 del LCD 
+PO14		EQU		0	; Corresponde al pin que se conecta al pin D6 del LCD 
+P015		EQU		0	; Corresponde al pin que se conecta al pin D7 del LCD 
+	
+; Mensajes en hexadecimal que se le envian al LCD
+LCDSA1		EQU		54686520	;corresponde a la parte 1 del mensaje  "sin alerta" que se envia al LCD
+LCDSA2		EQU		79737465	;corresponde a la parte 2 del mensaje  "sin alerta" que se envia al LCD
+LCDSA3		EQU		20686173	;corresponde a la parte 3 del mensaje  "sin alerta" que se envia al LCD
+LCDSA4		EQU		6E6F7420	;corresponde a la parte 4 del mensaje  "sin alerta" que se envia al LCD
+LCDSA5		EQU		65746563	;corresponde a la parte 5 del mensaje  "sin alerta" que se envia al LCD
+LCDSA6		EQU		65642061	;corresponde a la parte 6 del mensaje  "sin alerta" que se envia al LCD
+LCDSA7		EQU		20616C65	;corresponde a la parte 7 del mensaje  "sin alerta" que se envia al LCD
+LCDSA8		EQU		74207369	;corresponde a la parte 8 del mensaje  "sin alerta" que se envia al LCD
+LCDSA9		EQU		6E616C0A	;corresponde a la parte 9 del mensaje  "sin alerta" que se envia al LCD
+
+LCDTI1		EQU		6E616C0A	;corresponde a la parte 1 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI2		EQU		54686520	;corresponde a la parte 2 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI3		EQU		79737465	;corresponde a la parte 3 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI4		EQU		20646574	;corresponde a la parte 4 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI5		EQU		63746564	;corresponde a la parte 5 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI6		EQU		616E2069	;corresponde a la parte 6 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI7		EQU		6C656761	;corresponde a la parte 7 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI8		EQU		2074656D	;corresponde a la parte 8 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI9		EQU		65726174	;corresponde a la parte 9 del mensaje  "temperatura ilegal" que se envia al LCD
+LCDTI10		EQU		72650000	;corresponde a la parte 10 del mensaje  "temperatura ilegal" que se envia al LCD
+
+LCDDI1		EQU		54686520	;corresponde a la parte 1 del mensaje  "distancia ilegal" que se envia al LCD
+LCDDI2		EQU		79737465	;corresponde a la parte 2 del mensaje  "distancia ilegal" que se envia al LCD
+LCDDI3		EQU		20646574	;corresponde a la parte 3 del mensaje  "distancia ilegal" que se envia al LCD
+LCDDI4		EQU		63746564	;corresponde a la parte 4 del mensaje  "distancia ilegal" que se envia al LCD
+LCDDI5		EQU		616E2075	;corresponde a la parte 5 del mensaje  "distancia ilegal" que se envia al LCD
+LCDDI6		EQU		61636365	;corresponde a la parte 6 del mensaje  "distancia ilegal" que se envia al LCD
+LCDDI7		EQU		7461626C	;corresponde a la parte 7 del mensaje  "distancia ilegal" que se envia al LCD
+LCDDI8		EQU		20646973	;corresponde a la parte 8 del mensaje  "distancia ilegal" que se envia al LCD
+LCDDI9		EQU		616E6365	;corresponde a la parte 9 del mensaje  "distancia ilegal" que se envia al LCD
+
+
 
 
 ; Código del programa principal
@@ -78,6 +126,7 @@ __main
 INF		BL		GDC   ; Branch de la subrutina GDC = Get de los Datos de las Cámaras
 		BL		PDS   ; Branch de la subrutina PDS = Post de los Datos al Server
 		BL		GMA   ; Branch de la subrutina GMA = Get del Mensaje y de la Alarma
+		BL 		SDE	  ; Branch de la subrutina SDE = Subrutina de Envio
 		BL      EMA   ; Branch de la subrutina EMA = Escritura del Mensaje en el LCD y activar las Alarmas
 		
 		
@@ -579,9 +628,206 @@ GMA5	LDR R7,=G4BS ; Se carga en R7 la dirección de memoria donde se obtienen los
 		
 
 ; Paso #4
-; Subrutina que se encarga de mandar al LCD el mensaje obtenido através del servidor y de activar o no las alarmas dependiendo de lo obtenido por el Server
+; Subrutina de envio al LCD
 
-EMA 	BL  INF ; Se regresa al Branch INF para generar un loop infinito que pase realizando las peticiones GET,POST y activar o no las alarmas del sistema
+SDE		LDR R6,=P04	;Se inicializa el pin 4 que corresponde al RS del LCD
+		MOV	R7,TRUE
+		STR R7,[R6] ;RS = 1
+		LDR R8,=P06	;Se inicializa el pin 6 que corresponde al E del LCD
+		STR R7,[R8] ;E = 1
+		LDR R7,=P05	;Se inicializa el pin 5 que corresponde al RW del LCD
+		MOV R8,FALSE
+		STR R8,[R7] ;RW = 0
+			
+		MOV R7,#2
+DL22	CBZ	R7,SDE2
+		SUB R7,R7,#1	;delay de 2 milisegundos
+		B	DL22
+			
+SDE2	MOV R8,FALSE	;EN = 0
+			
+		MOV R7,#5
+DL5		CBZ	R7,SDE3
+		SUB R7,R7,#1	;delay de 5 milisegundos
+		B	DL5
+			
+SDE3	BX	LR ; Se retorna al flujo principal
+			
+			
+; Paso #5
+; Subrutina que se encarga de mandar al LCD el mensaje obtenido através del servidor y de activar o no las alarmas dependiendo de lo obtenido por el Server		
 		
+ 	
+EMA		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10, LCDSA1
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
 		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV	R10,LCDSA2
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDSA3
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDSA4
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDSA5
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDSA6
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDSA7
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDSA8
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDSA9
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+			
+		BEQ DONE
+
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI1
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI2
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI3
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI4
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI5
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI6
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI7
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI8
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI9
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio
+			
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDTI10
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL  SDE			;Se llama a la subrutina de envio	
+			
+		BEQ DONE
+
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI2
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI3
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI4
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI5
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI6
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI7
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI8
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+		
+		LDR R3, =SLDC	;Se inicializa la salida de datos al LCD
+		MOV R10,LCDDI9
+		STR R10,[R3]	;Se carga la parte del mensaje 
+		BL SDE			;Se llama a la subrutina de envio
+			
+		BEQ DONE
+
+		
+DONE	CMP R2,TRUE	;if alarma == 1
+		BNE L1
+		LDR    R1,  =SL1
+		LDR    R0,  [R1]
+		ORR.W  R0,  #0x08	;enciende el LED
+		STR    R0,  [R1]
+		B L2	
+		
+L1		LDR	   R1,  =SL1
+		LDR	   R0,  [R1]
+		AND.W  R0,  #0xFFFF0FFF	;apaga el LED
+		STR	   R0,  [R1]
+		
+			
+L2		BL  INF ; Se regresa al Branch INF para generar un loop infinito que pase realizando las peticiones GET,POST y activar o no las alarmas del sistema
+			
 		END
+
+
+
+		
+		
+
+			
+			
+
